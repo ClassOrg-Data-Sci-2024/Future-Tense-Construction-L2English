@@ -6,6 +6,10 @@ Daniel Crawford
 - [Correlation of Future Tense Construction Preference with Proficiency
   Scores for English L2
   Learners](#correlation-of-future-tense-construction-preference-with-proficiency-scores-for-english-l2-learners)
+  - [Load Data](#load-data)
+  - [Set the regex - these will likely
+    change](#set-the-regex---these-will-likely-change)
+  - [Format the Data](#format-the-data)
 - [Session Info](#session-info)
 
 # Correlation of Future Tense Construction Preference with Proficiency Scores for English L2 Learners
@@ -25,6 +29,8 @@ library(tidyverse)
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
     ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+### Load Data
 
 ``` r
 #Read in Data from PELIC: 
@@ -13207,14 +13213,19 @@ student_info
     ## 1312                                                     NA
     ## 1313                                                     NA
 
+### Set the regex - these will likely change
+
 ``` r
 #RegEx for 'will' construction
 RE_will = "will"
 
 #RegEx for 'going to' construction
 RE_goingto = "going to"
+```
 
+### Format the Data
 
+``` r
 data %>% 
   #Optional Slicer - can have long run time if too many rows are used
   #slice(1:10) %>% 

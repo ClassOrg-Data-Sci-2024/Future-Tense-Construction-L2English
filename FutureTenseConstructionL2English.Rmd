@@ -15,7 +15,7 @@ output:
 library(tidyverse)
 ```
 
-
+### Load Data
 ```{r}
 #Read in Data from PELIC: 
 data = as.tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv")))
@@ -30,6 +30,7 @@ student_info
   
 ```
 
+### Set the regex - these will likely change
 ```{r}
 
 #RegEx for 'will' construction
@@ -37,8 +38,10 @@ RE_will = "will"
 
 #RegEx for 'going to' construction
 RE_goingto = "going to"
+```
 
-
+### Format the Data 
+```{r}
 data %>% 
   #Optional Slicer - can have long run time if too many rows are used
   #slice(1:10) %>% 
