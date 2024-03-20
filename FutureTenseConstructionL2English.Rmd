@@ -26,7 +26,7 @@ data
 #Need to get demographic and proficiency scores for each student
 
 student_info = read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv"))
-student_info
+
   
 ```
 
