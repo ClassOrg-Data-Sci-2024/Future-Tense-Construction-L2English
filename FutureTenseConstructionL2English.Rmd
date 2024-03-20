@@ -16,19 +16,29 @@ library(tidyverse)
 ```
 
 ### Load Data
+Raw data can be found [here](https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv).
+
 ```{r}
 #Read in Data from PELIC: 
-data = as.tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv")))
-data
+PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+nrow(PELIC_compiled)
+ncol(PELIC_compiled)
+head(PELIC_compiled)
 ```
+
+The data contains about 46,000 entries, and a vast about of background data on the students. Of note will be L1, level, and profiency. 
 
 ```{r}
 #Need to get demographic and proficiency scores for each student
 
-student_info = read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv"))
-
+student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
+nrow(student_info)
+ncol(student_info)
+head(student_info)
   
 ```
+
+The student information for the 1,313 students expands on the demographics, and will be joined in later to the data. 
 
 ### Set the regex - these will likely change
 ```{r}
@@ -72,12 +82,13 @@ data %>%
     ),
       by = 'anon_id'
     
-  )
+  ) %>% 
+  write.csv("working_data.csv")
         
 ```
 
 
-
+My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information. The `working_data.csv` is the current end product of my data. 
 
 
 
