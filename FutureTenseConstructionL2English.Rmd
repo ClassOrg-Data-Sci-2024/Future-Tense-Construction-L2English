@@ -1,0 +1,78 @@
+# Correlation of Future Tense Construction Preference with Proficiency Scores for English L2 Learners
+
+```{r}
+#Import Packages
+library(tidyverse)
+```
+
+
+```{r}
+#Read in Data from PELIC: 
+data = as.tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv")))
+data
+```
+
+```{r}
+#Need to get demographic and proficiency scores for each student
+
+student_info = read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv"))
+student_info
+  
+```
+
+```{r}
+
+#RegEx for 'will' construction
+RE_will = "will"
+
+#RegEx for 'going to' construction
+RE_goingto = "going to"
+
+
+data %>% 
+  #Optional Slicer - can have long run time if too many rows are used
+  #slice(1:10) %>% 
+  #Get just the id and the text - this is preferable and equivalent to having to concat all the text form a user
+  select(anon_id,text) %>% 
+  #Count number of occurrences of will construction
+  mutate(will_ct = 
+           map_int(text,
+               ~ .x %>%
+                  str_count(RE_will)
+           )
+  ) %>% 
+  #Count number of occurrences going to constructions
+  mutate(goingto_ct = 
+           map_int(text,
+               ~ .x %>%
+                  str_count(RE_goingto)
+           )
+  ) %>% 
+  #Group By individual
+  group_by(anon_id) %>% 
+  #sum the construction counts
+  summarise_at(c("will_ct", "goingto_ct"),sum) %>% 
+  left_join(
+    (
+      student_info %>% 
+        select(anon_id,gender,gender,birth_year,native_language,yrs_in_english_environment,yrs_of_english_learning)
+    ),
+      by = 'anon_id'
+    
+  )
+        
+```
+
+
+
+
+
+
+
+
+
+# Session Info
+```{r}
+sessionInfo()
+```
+
