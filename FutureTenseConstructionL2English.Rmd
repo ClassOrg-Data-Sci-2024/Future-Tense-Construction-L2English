@@ -1,12 +1,12 @@
 ---
 title: "FutureTenseConstructionL2English"
 author: "Daniel Crawford"
-date: "03/20/2024"
+date: "04/02/2024"
 output: 
   github_document: 
     toc: TRUE
 ---
-
+EXISTING
 
 # Correlation of Future Tense Construction Preference with Proficiency Scores for English L2 Learners
 
@@ -48,11 +48,82 @@ RE_will = "will"
 
 #RegEx for 'going to' construction
 RE_goingto = "going to"
+
 ```
+
+
+```{r}
+will_lemmas = PELIC_compiled %>% 
+  filter(str_detect(text, RE_will)) %>% 
+  select(tok_lem_POS) %>% 
+  mutate(code = str_extract_all(tok_lem_POS, "'will',[^\\)]*")) %>% 
+  unnest(code) %>% 
+  mutate(code = str_split_i(code, ",",-1)) %>% 
+  select(code) %>% 
+  count(code)
+
+will_lemmas
+  
+```
+
+
+```{r}
+
+convert_to_list <- function(str) {
+  return(gsub("[^[:alnum:]]","",unlist(strsplit(gsub("\\(|\\)", "", unlist(strsplit(gsub("^\\[|\\]$", "",str),","))), ",\\s*"))))
+}
+
+
+check_future <- function(vec){
+  text = convert_to_list(vec)
+  idx = match('going',text)
+  
+  
+  if(!is.na(text[(idx+5)])){
+    if(text[(idx+5)] == 'TO'){
+      if(startsWith(text[(idx+8)],"V")){
+        return('GoingToFuture')
+      }else{
+        return('GoingNoV')
+      }
+    }else{
+      return('GoingNoTo')
+    }
+  }else{
+   return('Error')
+  }
+    
+
+}
+
+```
+
+
+
+```{r}
+going_lemmas = PELIC_compiled %>% 
+  slice(1:200) %>% 
+  filter(str_detect(text, "going")) %>% 
+  select(tok_lem_POS)
+
+going_lemmas
+```
+
+
+
+
+```{r}
+map(map(going_lemmas$tok_lem_POS,convert_to_list),check_future)
+```
+
+
+
+ 
+
 
 ### Format the Data 
 ```{r}
-data %>% 
+PELIC_compiled %>% 
   #Optional Slicer - can have long run time if too many rows are used
   #slice(1:10) %>% 
   #Get just the id and the text - this is preferable and equivalent to having to concat all the text form a user

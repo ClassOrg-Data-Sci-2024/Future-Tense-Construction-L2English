@@ -1,7 +1,8 @@
 FutureTenseConstructionL2English
 ================
 Daniel Crawford
-03/20/2024
+04/02/2024
+EXISTING
 
 - [Correlation of Future Tense Construction Preference with Proficiency
   Scores for English L2
@@ -32,44 +33,80 @@ library(tidyverse)
 
 ### Load Data
 
+Raw data can be found
+[here](https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv).
+
 ``` r
 #Read in Data from PELIC: 
-data = as.tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv")))
+PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+nrow(PELIC_compiled)
 ```
 
-    ## Warning: `as.tibble()` was deprecated in tibble 2.0.0.
-    ## ℹ Please use `as_tibble()` instead.
-    ## ℹ The signature and semantics have changed, see `?as_tibble`.
-    ## This warning is displayed once every 8 hours.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
+    ## [1] 46204
 
 ``` r
-data
+ncol(PELIC_compiled)
 ```
 
-    ## # A tibble: 46,204 × 15
-    ##    answer_id anon_id L1      gender semester  placement_test course_id level_id
-    ##        <int> <chr>   <chr>   <chr>  <chr>              <dbl>     <int>    <int>
-    ##  1         1 eq0     Arabic  Male   2006_fall             NA       149        4
-    ##  2         2 am8     Thai    Female 2006_fall             NA       149        4
-    ##  3         3 dk5     Turkish Female 2006_fall             NA       115        4
-    ##  4         4 dk5     Turkish Female 2006_fall             NA       115        4
-    ##  5         5 ad1     Korean  Female 2006_fall             NA       115        4
-    ##  6         6 ad1     Korean  Female 2006_fall             NA       115        4
-    ##  7         7 eg5     Korean  Female 2006_fall             NA       115        4
-    ##  8         8 eg5     Korean  Female 2006_fall             NA       115        4
-    ##  9         9 ad1     Korean  Female 2006_fall             NA       115        4
-    ## 10        10 ad1     Korean  Female 2006_fall             NA       115        4
-    ## # ℹ 46,194 more rows
+    ## [1] 15
+
+``` r
+head(PELIC_compiled)
+```
+
+    ## # A tibble: 6 × 15
+    ##   answer_id anon_id L1      gender semester  placement_test course_id level_id
+    ##       <int> <chr>   <chr>   <chr>  <chr>              <dbl>     <int>    <int>
+    ## 1         1 eq0     Arabic  Male   2006_fall             NA       149        4
+    ## 2         2 am8     Thai    Female 2006_fall             NA       149        4
+    ## 3         3 dk5     Turkish Female 2006_fall             NA       115        4
+    ## 4         4 dk5     Turkish Female 2006_fall             NA       115        4
+    ## 5         5 ad1     Korean  Female 2006_fall             NA       115        4
+    ## 6         6 ad1     Korean  Female 2006_fall             NA       115        4
     ## # ℹ 7 more variables: class_id <chr>, question_id <int>, version <int>,
     ## #   text_len <int>, text <chr>, tokens <chr>, tok_lem_POS <chr>
+
+The data contains about 46,000 entries, and a vast about of background
+data on the students. Of note will be L1, level, and profiency.
 
 ``` r
 #Need to get demographic and proficiency scores for each student
 
-student_info = read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv"))
+student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
+nrow(student_info)
 ```
+
+    ## [1] 1313
+
+``` r
+ncol(student_info)
+```
+
+    ## [1] 21
+
+``` r
+head(student_info)
+```
+
+    ## # A tibble: 6 × 21
+    ##   anon_id gender birth_year native_language language_used_at_home
+    ##   <chr>   <chr>       <int> <chr>           <chr>                
+    ## 1 ez9     Male         1978 Arabic          Arabic               
+    ## 2 gm3     Male         1980 Arabic          Arabic               
+    ## 3 fg5     Male         1938 Nepali          Nepali               
+    ## 4 ce5     Female       1984 Korean          Korean               
+    ## 5 fi7     Female       1982 Korean          Korean;Japanese      
+    ## 6 ds7     Female       1985 Korean          Korean               
+    ## # ℹ 16 more variables: non_native_language_1 <chr>, yrs_of_study_lang1 <chr>,
+    ## #   study_in_classroom_lang1 <chr>, ways_of_study_lang1 <chr>,
+    ## #   non_native_language_2 <chr>, yrs_of_study_lang2 <chr>,
+    ## #   study_in_classroom_lang2 <chr>, ways_of_study_lang2 <chr>,
+    ## #   non_native_language_3 <chr>, yrs_of_study_lang3 <chr>,
+    ## #   study_in_classroom_lang3 <chr>, ways_of_study_lang3 <chr>,
+    ## #   course_history <chr>, yrs_of_english_learning <chr>, …
+
+The student information for the 1,313 students expands on the
+demographics, and will be joined in later to the data.
 
 ### Set the regex - these will likely change
 
@@ -81,10 +118,149 @@ RE_will = "will"
 RE_goingto = "going to"
 ```
 
+``` r
+will_lemmas = PELIC_compiled %>% 
+  filter(str_detect(text, RE_will)) %>% 
+  select(tok_lem_POS) %>% 
+  mutate(code = str_extract_all(tok_lem_POS, "'will',[^\\)]*")) %>% 
+  unnest(code) %>% 
+  mutate(code = str_split_i(code, ",",-1)) %>% 
+  select(code) %>% 
+  count(code)
+
+will_lemmas
+```
+
+    ## # A tibble: 4 × 2
+    ##   code         n
+    ##   <chr>    <int>
+    ## 1 " 'MD'"  17510
+    ## 2 " 'VB'"      5
+    ## 3 " 'VBD'"     4
+    ## 4 " 'VBP'"     4
+
+``` r
+convert_to_list <- function(str) {
+  return(gsub("[^[:alnum:]]","",unlist(strsplit(gsub("\\(|\\)", "", unlist(strsplit(gsub("^\\[|\\]$", "",str),","))), ",\\s*"))))
+}
+
+
+check_future <- function(vec){
+  text = convert_to_list(vec)
+  idx = match('going',text)
+  
+  
+  if(!is.na(text[(idx+5)])){
+    if(text[(idx+5)] == 'TO'){
+      if(startsWith(text[(idx+8)],"V")){
+        return('GoingToFuture')
+      }else{
+        return('GoingNoV')
+      }
+    }else{
+      return('GoingNoTo')
+    }
+  }else{
+   return('Error')
+  }
+    
+
+}
+```
+
+``` r
+going_lemmas = PELIC_compiled %>% 
+  slice(1:200) %>% 
+  filter(str_detect(text, "going")) %>% 
+  select(tok_lem_POS)
+
+going_lemmas
+```
+
+    ## # A tibble: 18 × 1
+    ##    tok_lem_POS                                                                  
+    ##    <chr>                                                                        
+    ##  1 "[('Ten', 'ten', 'CD'), ('years', 'year', 'NNS'), ('ago', 'ago', 'RB'), (','…
+    ##  2 "[('In', 'in', 'IN'), ('Korea', 'Korea', 'NNP'), ('it', 'it', 'PRP'), ('is',…
+    ##  3 "[('The', 'the', 'DT'), ('accident', 'accident', 'NN'), ('did', 'do', 'VBD')…
+    ##  4 "[('When', 'when', 'WRB'), ('I', 'I', 'PRP'), ('was', 'be', 'VBD'), ('in', '…
+    ##  5 "[('5T', '5T', 'CD'), ('22', '22', 'CD'), ('/', '/', 'JJ'), ('09', '09', 'CD…
+    ##  6 "[('Some', 'some', 'DT'), ('people', 'people', 'NNS'), ('said', 'say', 'VBD'…
+    ##  7 "[('``', '``', '``'), ('Not', 'not', 'RB'), ('all', 'all', 'DT'), ('learning…
+    ##  8 "[('Neighbors', 'neighbor', 'NNS'), ('Neighbor', 'Neighbor', 'NNP'), ('is', …
+    ##  9 "[('Gaining', 'gain', 'VBG'), ('knowledge', 'knowledge', 'NN'), ('comes', 'c…
+    ## 10 "[('Gaining', 'gain', 'VBG'), ('knowledge', 'knowledge', 'NN'), ('comes', 'c…
+    ## 11 "[('Each', 'each', 'DT'), ('person', 'person', 'NN'), ('has', 'have', 'VBZ')…
+    ## 12 "[('The', 'the', 'DT'), ('expectations', 'expectation', 'NNS'), ('of', 'of',…
+    ## 13 "[('Reflecting', 'reflect', 'VBG'), ('on', 'on', 'IN'), (',', ',', ','), ('t…
+    ## 14 "[('Hello', 'Hello', 'NNP'), (',', ',', ','), ('welcome', 'welcome', 'NN'), …
+    ## 15 "[('I', 'I', 'PRP'), ('believe', 'believe', 'VBP'), ('that', 'that', 'IN'), …
+    ## 16 "[('Welcome', 'welcome', 'JJ'), ('to', 'to', 'TO'), ('read', 'read', 'VB'), …
+    ## 17 "[('I', 'I', 'PRP'), ('was', 'be', 'VBD'), ('working', 'work', 'VBG'), ('as'…
+    ## 18 "[('I', 'I', 'PRP'), ('grew', 'grow', 'VBD'), ('up', 'up', 'RP'), ('in', 'in…
+
+``` r
+map(map(going_lemmas$tok_lem_POS,convert_to_list),check_future)
+```
+
+    ## [[1]]
+    ## [1] "GoingNoV"
+    ## 
+    ## [[2]]
+    ## [1] "GoingNoTo"
+    ## 
+    ## [[3]]
+    ## [1] "GoingToFuture"
+    ## 
+    ## [[4]]
+    ## [1] "GoingNoV"
+    ## 
+    ## [[5]]
+    ## [1] "GoingToFuture"
+    ## 
+    ## [[6]]
+    ## [1] "GoingToFuture"
+    ## 
+    ## [[7]]
+    ## [1] "GoingNoV"
+    ## 
+    ## [[8]]
+    ## [1] "GoingToFuture"
+    ## 
+    ## [[9]]
+    ## [1] "GoingNoTo"
+    ## 
+    ## [[10]]
+    ## [1] "GoingNoTo"
+    ## 
+    ## [[11]]
+    ## [1] "GoingNoTo"
+    ## 
+    ## [[12]]
+    ## [1] "Error"
+    ## 
+    ## [[13]]
+    ## [1] "GoingNoTo"
+    ## 
+    ## [[14]]
+    ## [1] "GoingNoV"
+    ## 
+    ## [[15]]
+    ## [1] "GoingToFuture"
+    ## 
+    ## [[16]]
+    ## [1] "GoingNoV"
+    ## 
+    ## [[17]]
+    ## [1] "GoingNoV"
+    ## 
+    ## [[18]]
+    ## [1] "GoingToFuture"
+
 ### Format the Data
 
 ``` r
-data %>% 
+PELIC_compiled %>% 
   #Optional Slicer - can have long run time if too many rows are used
   #slice(1:10) %>% 
   #Get just the id and the text - this is preferable and equivalent to having to concat all the text form a user
@@ -114,25 +290,13 @@ data %>%
     ),
       by = 'anon_id'
     
-  )
+  ) %>% 
+  write.csv("working_data.csv")
 ```
 
-    ## # A tibble: 1,177 × 8
-    ##    anon_id will_ct goingto_ct gender  birth_year native_language
-    ##    <chr>     <int>      <int> <chr>        <int> <chr>          
-    ##  1 aa0           7          0 Male          1984 Spanish        
-    ##  2 aa1          40          0 Male          1983 Chinese        
-    ##  3 aa2          20          2 Male          1967 Arabic         
-    ##  4 aa3           3          1 Unknown         NA Chinese        
-    ##  5 aa5           2          0 Unknown         NA Chinese        
-    ##  6 aa8           1         23 Female        1976 Korean         
-    ##  7 aa9           4          4 Male          1987 Korean         
-    ##  8 ab1           1          0 Male            NA Hebrew         
-    ##  9 ab2          11          0 Female          NA Arabic         
-    ## 10 ab6           4          0 Male            NA Chinese        
-    ## # ℹ 1,167 more rows
-    ## # ℹ 2 more variables: yrs_in_english_environment <chr>,
-    ## #   yrs_of_english_learning <chr>
+My strategy for importing the data is to find construction in question
+in the text, and then to join in the student demographic information.
+The `working_data.csv` is the current end product of my data.
 
 # Session Info
 
@@ -166,12 +330,12 @@ sessionInfo()
     ##  [9] ggplot2_3.4.3   tidyverse_2.0.0
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] gtable_0.3.4      crayon_1.5.2      compiler_4.3.2    tidyselect_1.2.0 
-    ##  [5] scales_1.2.1      yaml_2.3.7        fastmap_1.1.1     R6_2.5.1         
-    ##  [9] generics_0.1.3    knitr_1.44        munsell_0.5.0     pillar_1.9.0     
-    ## [13] tzdb_0.4.0        rlang_1.1.1       utf8_1.2.3        stringi_1.7.12   
-    ## [17] xfun_0.40         timechange_0.2.0  cli_3.6.1         withr_2.5.0      
-    ## [21] magrittr_2.0.3    digest_0.6.33     grid_4.3.2        rstudioapi_0.15.0
-    ## [25] hms_1.1.3         lifecycle_1.0.3   vctrs_0.6.3       evaluate_0.21    
-    ## [29] glue_1.6.2        fansi_1.0.4       colorspace_2.1-0  rmarkdown_2.25   
-    ## [33] tools_4.3.2       pkgconfig_2.0.3   htmltools_0.5.6
+    ##  [1] gtable_0.3.4      compiler_4.3.2    tidyselect_1.2.0  scales_1.2.1     
+    ##  [5] yaml_2.3.7        fastmap_1.1.1     R6_2.5.1          generics_0.1.3   
+    ##  [9] knitr_1.44        munsell_0.5.0     pillar_1.9.0      tzdb_0.4.0       
+    ## [13] rlang_1.1.1       utf8_1.2.3        stringi_1.7.12    xfun_0.40        
+    ## [17] timechange_0.2.0  cli_3.6.1         withr_2.5.0       magrittr_2.0.3   
+    ## [21] digest_0.6.33     grid_4.3.2        rstudioapi_0.15.0 hms_1.1.3        
+    ## [25] lifecycle_1.0.3   vctrs_0.6.3       evaluate_0.21     glue_1.6.2       
+    ## [29] fansi_1.0.4       colorspace_2.1-0  rmarkdown_2.25    tools_4.3.2      
+    ## [33] pkgconfig_2.0.3   htmltools_0.5.6
