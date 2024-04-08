@@ -66,55 +66,61 @@ will_lemmas
   
 ```
 
-
 ```{r}
 
-convert_to_list <- function(str) {
-  return(gsub("[^[:alnum:]]","",unlist(strsplit(gsub("\\(|\\)", "", unlist(strsplit(gsub("^\\[|\\]$", "",str),","))), ",\\s*"))))
+tlp_text_to_df = function(x){
+  
+  text_df = x %>% 
+    str_remove("^\\[\\(") %>% 
+    str_remove("\\)\\]$") %>% 
+    str_split_1("\\), \\(") %>% 
+    str_remove_all("'") %>% 
+    as.tibble() %>% 
+    separate(value, into = c("token","lemma","POS"), sep = ',')
+  
+  return(text_df)
+  
 }
 
-
-check_future <- function(vec){
-  text = convert_to_list(vec)
-  idx = match('going',text)
+count_going_to_then_verb = function(text_df){
+  going_idx = which(text_df$token == "going")
+  idxs = sort(unique(c(going_idx,going_idx+1,going_idx+2,going_idx + 3)))
   
-  
-  if(!is.na(text[(idx+5)])){
-    if(text[(idx+5)] == 'TO'){
-      if(startsWith(text[(idx+8)],"V")){
-        return('GoingToFuture')
-      }else{
-        return('GoingNoV')
-      }
-    }else{
-      return('GoingNoTo')
+  ctr = 0
+  for (idx in going_idx){
+      if (trimws(text_df$POS[idx+1]) == "TO"){
+        if (startsWith(trimws(text_df$POS[idx+2]), 'V') || startsWith(trimws(text_df$POS[idx+3]), 'V')){
+          ctr = ctr + 1
+        }
     }
-  }else{
-   return('Error')
   }
-    
+  return(ctr)
 
 }
 
+
+text_to_count = function(str){
+  text_df = tlp_text_to_df(str)
+  count = count_going_to_then_verb(text_df)
+  return(count)
+}
+  
 ```
-
-
 
 ```{r}
-going_lemmas = PELIC_compiled %>% 
-  slice(1:200) %>% 
-  filter(str_detect(text, "going")) %>% 
-  select(tok_lem_POS)
+PELIC_compiled %>% 
+  slice(1:100) %>% 
+  mutate(future_count = map_dbl(tok_lem_POS, text_to_count))
 
-going_lemmas
+
+
+
+
+
 ```
 
 
 
-
-```{r}
-map(map(going_lemmas$tok_lem_POS,convert_to_list),check_future)
-```
 
 
 
