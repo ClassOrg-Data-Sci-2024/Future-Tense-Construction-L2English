@@ -40,31 +40,10 @@ head(student_info)
 
 The student information for the 1,313 students expands on the demographics, and will be joined in later to the data. 
 
-### Set the regex - these will likely change
-```{r}
-
-#RegEx for 'will' construction
-RE_will = "will"
-
-#RegEx for 'going to' construction
-RE_goingto = "going to"
-
-```
+### Set the functions
 
 
-```{r}
-will_lemmas = PELIC_compiled %>% 
-  filter(str_detect(text, RE_will)) %>% 
-  select(tok_lem_POS) %>% 
-  mutate(code = str_extract_all(tok_lem_POS, "'will',[^\\)]*")) %>% 
-  unnest(code) %>% 
-  mutate(code = str_split_i(code, ",",-1)) %>% 
-  select(code) %>% 
-  count(code)
 
-will_lemmas
-  
-```
 
 ```{r}
 
@@ -98,56 +77,51 @@ count_going_to_then_verb = function(text_df){
 
 }
 
+count_will_MD = function(text_df){
+  
+  will_idx = which(text_df$token == "will")
+  
+  ctr = 0
+  for (idx in will_idx){
+      if (trimws(text_df$POS[idx]) == "MD"){
+        ctr = ctr + 1
+    }
+  }
+  return(ctr)
 
-text_to_count = function(str){
+}
+
+
+text_to_count_GOING = function(str){
   text_df = tlp_text_to_df(str)
   count = count_going_to_then_verb(text_df)
+  return(count)
+}
+
+count_will_MD = function(str){
+  text_df = tlp_text_to_df(str)
+  count = count_will_MD(text_df)
   return(count)
 }
   
 ```
 
-```{r}
-PELIC_compiled %>% 
-  slice(1:100) %>% 
-  mutate(future_count = map_dbl(tok_lem_POS, text_to_count))
 
 
 
-
-
-
-```
-
-
-
-
-
-
- 
 
 
 ### Format the Data 
 ```{r}
 PELIC_compiled %>% 
   #Optional Slicer - can have long run time if too many rows are used
-  #slice(1:10) %>% 
+  slice(28:32) %>% 
   #Get just the id and the text - this is preferable and equivalent to having to concat all the text form a user
-  select(anon_id,text) %>% 
+  select(anon_id,tok_lem_POS) %>% 
   #Count number of occurrences of will construction
-  mutate(will_ct = 
-           map_int(text,
-               ~ .x %>%
-                  str_count(RE_will)
-           )
-  ) %>% 
+  mutate(will_ct = map(tok_lem_POS, count_will_MD(.))) %>% 
   #Count number of occurrences going to constructions
-  mutate(goingto_ct = 
-           map_int(text,
-               ~ .x %>%
-                  str_count(RE_goingto)
-           )
-  ) %>% 
+  mutate(goingto_ct = map(tok_lem_POS,text_to_count_GOING(.))) %>% 
   #Group By individual
   group_by(anon_id) %>% 
   #sum the construction counts
@@ -159,8 +133,8 @@ PELIC_compiled %>%
     ),
       by = 'anon_id'
     
-  ) %>% 
-  write.csv("working_data.csv")
+  ) 
+  #write.csv("working_data.csv")
         
 ```
 
