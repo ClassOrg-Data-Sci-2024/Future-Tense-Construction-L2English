@@ -40,139 +40,84 @@ head(student_info)
 
 The student information for the 1,313 students expands on the demographics, and will be joined in later to the data. 
 
-### Set the functions
-
-
-
-
-```{r}
-
-tlp_text_to_df = function(x){
-  
-  text_df = x %>% 
-    str_remove("^\\[\\(") %>% 
-    str_remove("\\)\\]$") %>% 
-    str_split_1("\\), \\(") %>% 
-    str_remove_all("'") %>% 
-    as.tibble() %>% 
-    separate(value, into = c("token","lemma","POS"), sep = ',')
-  
-  return(text_df)
-  
-}
-
-count_going_to_then_verb = function(text_df){
-  going_idx = which(text_df$token == "going")
-  idxs = sort(unique(c(going_idx,going_idx+1,going_idx+2,going_idx + 3)))
-  
-  ctr = 0
-  for (idx in going_idx){
-      if (trimws(text_df$POS[idx+1]) == "TO"){
-        if (startsWith(trimws(text_df$POS[idx+2]), 'V') || startsWith(trimws(text_df$POS[idx+3]), 'V')){
-          ctr = ctr + 1
-        }
-    }
-  }
-  return(ctr)
-
-}
-
-count_will_MD = function(text_df){
-  
-  will_idx = which(text_df$token == "will")
-  
-  ctr = 0
-  for (idx in will_idx){
-      if (trimws(text_df$POS[idx]) == "MD"){
-        ctr = ctr + 1
-    }
-  }
-  return(ctr)
-
-}
-
-
-text_to_count_GOING = function(str){
-  text_df = tlp_text_to_df(str)
-  count = count_going_to_then_verb(text_df)
-  return(count)
-}
-
-text_count_will_MD = function(str){
-  text_df = tlp_text_to_df(str)
-  count = count_will_MD(text_df)
-  return(count)
-}
-  
-```
-
-
-
-
-
-
-
-
-```{r}
-
-TEST_tlp_text_to_df = function(x){
-  
-  text_df = x %>% 
-    str_remove("^\\[\\(") %>% 
-    str_remove("\\)\\]$") %>% 
-    str_split_1("\\), \\(") %>% 
-    str_remove_all("'") %>% 
-    as.tibble() %>% 
-    filter(!startsWith(value, ",,")) %>% 
-    separate(value, into = c('token','lemma','POS'), sep = ',')
-  
-  return(text_df)
-  
-}
-
-
-
-tokenized_df = PELIC_compiled %>% 
-  slice(1:10) %>% 
-  mutate(tokenized_nested_df = map(tok_lem_POS, TEST_tlp_text_to_df)) %>% 
-  select(answer_id, tokenized_nested_df) %>% 
-  unnest(tokenized_nested_df)
-
-
-tokenized_df
-```
-
-
-
 
 
 
 
 ### Format the Data 
 ```{r}
-PELIC_compiled %>% 
-  #Optional Slicer - can have long run time if too many rows are used
-  slice(28:32) %>% 
-  #Get just the id and the text - this is preferable and equivalent to having to concat all the text form a user
-  select(anon_id,tok_lem_POS) %>% 
-  #Count number of occurrences of will construction
-  mutate(will_ct = map(tok_lem_POS, count_will_MD(.))) %>% 
-  #Count number of occurrences going to constructions
-  mutate(goingto_ct = map(tok_lem_POS,text_to_count_GOING(.))) %>% 
-  #Group By individual
+
+#A function to create a tokenized df with columns: token | lemma | POS
+#Input is a string
+tlp_text_to_df = function(x){
+  text_df = x %>% 
+    #Remove "[" character (at beginning of string)
+    str_remove("^\\[\\(") %>% 
+    #Remove "]" character (at end of string)
+    str_remove("\\)\\]$") %>% 
+    #split tuples
+    str_split_1("\\), \\(") %>% 
+    #remove 's
+    str_remove_all("'") %>% 
+    #convert to tibble
+    as.tibble() %>% 
+    #remove rows of commas - these are not relevant or impactful on analysis
+    filter(!startsWith(value, ",,")) %>% 
+    #separate into columns
+    separate(value, into = c('token','lemma','POS'), sep = ',')
+  
+  return(text_df)
+  
+}
+
+#Create tokenized_df, each row is a token
+tokenized_df = PELIC_compiled %>% 
+  #create tokenized df from the tok_lem_POS string
+  mutate(tokenized_nested_df = map(tok_lem_POS, tlp_text_to_df)) %>% 
+  #keep the unique identifier of answer id
+  select(answer_id, tokenized_nested_df) %>% 
+  #make the df longer and unndest
+  unnest(tokenized_nested_df) %>% 
+  #if there is a 'will' token that is a modal, put 1 in new column, else 0
+  mutate(is_will_construction = if_else(token == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
+  #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
+  mutate(is_goingTo_construction = 
+            if_else(
+              token == "going" & lead(token) == "to" & (
+                #lead allows to 'look ahead'
+                startsWith(trimws(lead(POS, 2)), 'V') | 
+                startsWith(trimws(lead(POS, 3)), 'V')
+              ),1,0)) %>% 
+  #get the answer id and counts
+  select(answer_id, is_will_construction, is_goingTo_construction) %>%
+  group_by(answer_id) %>% 
+  #sum counts by answer ID
+  summarise(
+    count_will_construction = sum(is_will_construction), 
+    count_goingTo_construction = sum(is_goingTo_construction)
+  )
+
+#this is the final data frame with the students info
+countruction_counts_and_student_info  = PELIC_compiled %>% 
+  #joing in the tokenized df with counts, on answer ID
+  left_join(tokenized_df, by = "answer_id") %>% 
+  #get the anon_id and counts, we do not need the text info
+  select(anon_id, count_will_construction, count_goingTo_construction) %>% 
   group_by(anon_id) %>% 
-  #sum the construction counts
-  summarise_at(c("will_ct", "goingto_ct"),sum) %>% 
-  left_join(
-    (
-      student_info %>% 
-        select(anon_id,gender,gender,birth_year,native_language,yrs_in_english_environment,yrs_of_english_learning)
-    ),
-      by = 'anon_id'
-    
-  ) 
-  #write.csv("working_data.csv")
+  #count construction usage by student
+  summarise(
+    count_will_construction = sum(count_will_construction), 
+    count_goingTo_construction = sum(count_goingTo_construction)
+  ) %>% 
+  #bring in student info
+  left_join(student_info, by = "anon_id")
+  
+
         
+```
+```{r}
+countruction_counts_and_student_info %>% 
+  write.csv('FINAL_DATA_countruction_counts_and_student_info.csv')
 ```
 
 
