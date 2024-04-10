@@ -98,13 +98,50 @@ text_to_count_GOING = function(str){
   return(count)
 }
 
-count_will_MD = function(str){
+text_count_will_MD = function(str){
   text_df = tlp_text_to_df(str)
   count = count_will_MD(text_df)
   return(count)
 }
   
 ```
+
+
+
+
+
+
+
+
+```{r}
+
+TEST_tlp_text_to_df = function(x){
+  
+  text_df = x %>% 
+    str_remove("^\\[\\(") %>% 
+    str_remove("\\)\\]$") %>% 
+    str_split_1("\\), \\(") %>% 
+    str_remove_all("'") %>% 
+    as.tibble() %>% 
+    filter(!startsWith(value, ",,")) %>% 
+    separate(value, into = c('token','lemma','POS'), sep = ',')
+  
+  return(text_df)
+  
+}
+
+
+
+tokenized_df = PELIC_compiled %>% 
+  slice(1:10) %>% 
+  mutate(tokenized_nested_df = map(tok_lem_POS, TEST_tlp_text_to_df)) %>% 
+  select(answer_id, tokenized_nested_df) %>% 
+  unnest(tokenized_nested_df)
+
+
+tokenized_df
+```
+
 
 
 
