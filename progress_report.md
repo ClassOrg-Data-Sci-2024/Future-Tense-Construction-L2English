@@ -33,3 +33,12 @@ The data will be the same as 'working data' right now, just with counts adjusted
 
 #### Liscense
 I am using the Creative Commons License [CC BY-NC-ND 4.0 DEED](https://creativecommons.org/licenses/by-nc-nd/4.0/) for two reasons. First, it ensures that if someone take my code, it cannot be used commercially. It also must be attributed to me, and indicate if any changes were made. But chiefly, it is the [license of the PELIC Database]([CC BY-NC-ND 4.0 DEED](https://creativecommons.org/licenses/by-nc-nd/4.0/)) already, so it would be a natural choice because what I have written "sits on top of" PELIC.
+
+## Progress Report 3
+I utilized a new apprach to get the data. Instead of using fucntions, with if statements to count the number of occurances, I utilized a [`tokenized_df`](https://github.com/ClassOrg-Data-Sci-2024/Future-Tense-Construction-L2English/blob/main/FutureTenseConstructionL2English.md#format-the-data) that allowed me to pt the tokens, lemmas, and part of speach, for each token in a response into a column. For the 'going to' construction I used `lead` to look ahead to check that, from a `going` token the next was `to` and then a verb (POS start with `V`) within the next two tokens. For `will` I jsut needed to check that the part of speech was `MD' (modal).
+
+Now I have the data in its [final form](https://github.com/ClassOrg-Data-Sci-2024/Future-Tense-Construction-L2English/blob/main/FINAL_DATA_countruction_counts_and_student_info.csv). This data has  arow for each student, with their various demographic information, and I can begin looking at how these vary. 
+
+
+
+
