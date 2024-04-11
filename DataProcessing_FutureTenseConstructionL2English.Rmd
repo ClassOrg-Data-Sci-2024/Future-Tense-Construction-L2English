@@ -1,0 +1,135 @@
+---
+title: "FutureTenseConstructionL2English"
+author: "Daniel Crawford"
+date: "04/02/2024"
+output: 
+  github_document: 
+    toc: TRUE
+---
+EXISTING
+
+# Correlation of Future Tense Construction Preference with Proficiency Scores for English L2 Learners
+
+```{r}
+#Import Packages
+library(tidyverse)
+```
+
+### Load Data
+Raw data can be found [here](https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv).
+
+```{r}
+#Read in Data from PELIC: 
+PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+nrow(PELIC_compiled)
+ncol(PELIC_compiled)
+head(PELIC_compiled)
+```
+
+The data contains about 46,000 entries, and a vast about of background data on the students. Of note will be L1, level, and profiency. 
+
+```{r}
+#Need to get demographic and proficiency scores for each student
+
+student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
+nrow(student_info)
+ncol(student_info)
+head(student_info)
+  
+```
+
+The student information for the 1,313 students expands on the demographics, and will be joined in later to the data. 
+
+
+
+
+
+### Format the Data 
+```{r}
+
+#A function to create a tokenized df with columns: token | lemma | POS
+#Input is a string
+tlp_text_to_df = function(x){
+  text_df = x %>% 
+    #Remove "[" character (at beginning of string)
+    str_remove("^\\[\\(") %>% 
+    #Remove "]" character (at end of string)
+    str_remove("\\)\\]$") %>% 
+    #split tuples
+    str_split_1("\\), \\(") %>% 
+    #remove 's
+    str_remove_all("'") %>% 
+    #convert to tibble
+    as.tibble() %>% 
+    #remove rows of commas - these are not relevant or impactful on analysis
+    filter(!startsWith(value, ",,")) %>% 
+    #separate into columns
+    separate(value, into = c('token','lemma','POS'), sep = ',')
+  
+  return(text_df)
+  
+}
+
+#Create tokenized_df, each row is a token
+tokenized_df = PELIC_compiled %>% 
+  #create tokenized df from the tok_lem_POS string
+  mutate(tokenized_nested_df = map(tok_lem_POS, tlp_text_to_df)) %>% 
+  #keep the unique identifier of answer id
+  select(answer_id, tokenized_nested_df) %>% 
+  #make the df longer and unndest
+  unnest(tokenized_nested_df) %>% 
+  #if there is a 'will' token that is a modal, put 1 in new column, else 0
+  mutate(is_will_construction = if_else(token == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
+  #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
+  mutate(is_goingTo_construction = 
+            if_else(
+              token == "going" & lead(token) == "to" & (
+                #lead allows to 'look ahead'
+                startsWith(trimws(lead(POS, 2)), 'V') | 
+                startsWith(trimws(lead(POS, 3)), 'V')
+              ),1,0)) %>% 
+  #get the answer id and counts
+  select(answer_id, is_will_construction, is_goingTo_construction) %>%
+  group_by(answer_id) %>% 
+  #sum counts by answer ID
+  summarise(
+    count_will_construction = sum(is_will_construction), 
+    count_goingTo_construction = sum(is_goingTo_construction)
+  )
+
+#this is the final data frame with the students info
+countruction_counts_and_student_info  = PELIC_compiled %>% 
+  #joing in the tokenized df with counts, on answer ID
+  left_join(tokenized_df, by = "answer_id") %>% 
+  #get the anon_id and counts, we do not need the text info
+  select(anon_id, count_will_construction, count_goingTo_construction) %>% 
+  group_by(anon_id) %>% 
+  #count construction usage by student
+  summarise(
+    count_will_construction = sum(count_will_construction), 
+    count_goingTo_construction = sum(count_goingTo_construction)
+  ) %>% 
+  #bring in student info
+  left_join(student_info, by = "anon_id")
+  
+
+        
+```
+```{r}
+countruction_counts_and_student_info %>% 
+  write.csv('FINAL_DATA_countruction_counts_and_student_info.csv')
+```
+
+
+My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information. The `working_data.csv` is the current end product of my data. 
+
+
+
+
+
+
+# Session Info
+```{r}
+sessionInfo()
+```
+

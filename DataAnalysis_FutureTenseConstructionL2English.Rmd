@@ -1,0 +1,24 @@
+---
+title: "FutureTenseConstructionL2English"
+author: "Daniel Crawford"
+date: "04/02/2024"
+output: 
+  github_document: 
+    toc: TRUE
+---
+
+
+# Pull in final data
+
+
+```{r}
+#Import Packages
+library(tidyverse)
+```
+
+```{r}
+construction_counts = as_tibble(read.csv('FINAL_DATA_countruction_counts_and_student_info.csv'))
+
+construction_counts
+```
+
