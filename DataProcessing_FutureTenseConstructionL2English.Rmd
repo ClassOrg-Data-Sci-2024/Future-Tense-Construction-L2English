@@ -28,6 +28,8 @@ head(PELIC_compiled)
 
 The data contains about 46,000 entries, and a vast about of background data on the students. Of note will be L1, level, and profiency. 
 
+
+
 ```{r}
 #Need to get demographic and proficiency scores for each student
 
@@ -40,13 +42,7 @@ head(student_info)
 
 The student information for the 1,313 students expands on the demographics, and will be joined in later to the data. 
 
-
-
-
-
-### Format the Data 
 ```{r}
-
 #A function to create a tokenized df with columns: token | lemma | POS
 #Input is a string
 tlp_text_to_df = function(x){
@@ -69,15 +65,33 @@ tlp_text_to_df = function(x){
   return(text_df)
   
 }
+```
 
+
+
+```{r}
 #Create tokenized_df, each row is a token
-tokenized_df = PELIC_compiled %>% 
+tokenized_df_unnested = PELIC_compiled %>% 
   #create tokenized df from the tok_lem_POS string
   mutate(tokenized_nested_df = map(tok_lem_POS, tlp_text_to_df)) %>% 
   #keep the unique identifier of answer id
   select(answer_id, tokenized_nested_df) %>% 
   #make the df longer and unndest
   unnest(tokenized_nested_df) %>% 
+  
+  
+tokenized_df_unnested %>% write.csv('data/tokenized_df_unnested.csv')
+
+tokenized_df_unnested = read.csv('data/tokenized_df_unnested.csv')
+
+```
+
+
+### Format the Data 
+```{r}
+
+#Create counts_data, each row is a token
+counts_data =  tokenized_df_unnested %>% 
   #if there is a 'will' token that is a modal, put 1 in new column, else 0
   mutate(is_will_construction = if_else(token == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
   #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
@@ -100,7 +114,7 @@ tokenized_df = PELIC_compiled %>%
 #this is the final data frame with the students info
 countruction_counts_and_student_info  = PELIC_compiled %>% 
   #joing in the tokenized df with counts, on answer ID
-  left_join(tokenized_df, by = "answer_id") %>% 
+  left_join(counts_data, by = "answer_id") %>% 
   #get the anon_id and counts, we do not need the text info
   select(anon_id, count_will_construction, count_goingTo_construction) %>% 
   group_by(anon_id) %>% 
@@ -115,9 +129,32 @@ countruction_counts_and_student_info  = PELIC_compiled %>%
 
         
 ```
+
+
+
 ```{r}
-countruction_counts_and_student_info %>% 
-  write.csv('FINAL_DATA_countruction_counts_and_student_info.csv')
+#score Data
+score_data = as_tibble(read.csv(url('https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/test_scores.csv')))
+
+#Find students who took the test more than once
+n_occur <- data.frame(table(score_data$anon_id))
+multiple_ids = n_occur[n_occur$Freq > 1,]$Var1
+
+#join in scores of students
+countruction_counts_and_student_info_with_scores = countruction_counts_and_student_info %>% 
+  inner_join(score_data %>% filter(!(trimws(anon_id) %in% multiple_ids)), by = 'anon_id')
+
+
+```
+
+
+
+
+
+
+```{r}
+countruction_counts_and_student_info_with_scores %>% 
+  write.csv('FINAL_DATA_countruction_counts_and_student_info_with_scores.csv')
 ```
 
 
