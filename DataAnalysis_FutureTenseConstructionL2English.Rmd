@@ -17,7 +17,7 @@ library(tidyverse)
 ```
 
 ```{r}
-construction_counts = as_tibble(read.csv('FINAL_DATA_countruction_counts_and_student_info.csv'))
+construction_counts = as_tibble(read.csv('FINAL_DATA_countruction_counts_and_student_info_with_scores.csv'))
 ```
 
 
@@ -34,8 +34,110 @@ construction_props
 
 
 ```{r}
+#Raw Distributuion of Scores
+
+construction_props %>% 
+  select(LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram() +
+  facet_wrap(~name)
+
+
+
+construction_props %>% 
+  select(Writing_Sample) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram() +
+  facet_wrap(~name)
+
 
 ```
+
+
+
+
+
+
+
+```{r}
+#Correlation of Proficiency Scores:
+
+scaled_construction_props = construction_props %>% 
+  select(anon_id, prop_will_construction, prop_goingTo_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
+  mutate(across(-c(anon_id,prop_will_construction, prop_goingTo_construction), ~ scale(.x))) 
+  
+  
+scaled_construction_props
+```
+
+
+```{r}
+scaled_construction_props %>% 
+  select(LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram() +
+  facet_wrap(~name)
+```
+
+
+```{r}
+cm = cor(scaled_construction_props %>%  select(LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample))
+
+as_tibble(cm) %>%
+  mutate(score = rownames(cm)) %>%
+  pivot_longer(!score) %>%
+  mutate(value = round(value,2)) %>% 
+  
+  ggplot(aes(x = score, y = name, fill = value)) +
+  
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    low = "blue",
+    high = "red",
+    mid = "white",
+    midpoint = 0,
+    limit = c(-1, 1),
+    space = "Lab",
+    name = "Pearson\nCorrelation"
+  ) +
+  theme_minimal() + # minimal theme
+  theme(axis.text.x = element_text(
+    angle = 45,
+    vjust = 1,
+    size = 12,
+    hjust = 1
+  )) +
+  coord_fixed() +
+  geom_text(aes(score, name, label = value),
+            color = "black",
+            size = 4) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    legend.justification = c(1, 0),
+    legend.direction = "horizontal"
+  ) +
+  guides(fill = guide_colorbar(
+    barwidth = 7,
+    barheight = 1,
+    title.position = "top",
+    title.hjust = 0.5
+  ))
+
+
+```
+
+```{r}
+rownames(cm)
+```
+
 
 
 
