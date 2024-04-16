@@ -158,7 +158,7 @@ countruction_counts_and_student_info_with_scores %>%
 ```
 
 
-My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information. The `working_data.csv` is the current end product of my data. 
+My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information. The `FINAL_DATA_countruction_counts_and_student_info_with_scores.csv` is the end product of my data. 
 
 
 
