@@ -18,7 +18,58 @@ library(tidyverse)
 
 ```{r}
 construction_counts = as_tibble(read.csv('FINAL_DATA_countruction_counts_and_student_info.csv'))
-
-construction_counts
 ```
+
+
+
+```{r}
+#Get proportions
+construction_props = construction_counts %>% 
+  mutate(prop_goingTo_construction = count_goingTo_construction/(count_will_construction+count_goingTo_construction), .after = anon_id) %>% 
+  mutate(prop_will_construction = count_will_construction/(count_will_construction+count_goingTo_construction), .after = anon_id)
+
+construction_props
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+construction_props %>%
+  #Get Only languages with at least 30 L1 speakers
+  group_by(native_language) %>% 
+  filter(n()>30) %>% 
+  select(native_language, prop_will_construction, prop_goingTo_construction) %>% 
+  
+  summarise(across(everything(), .f = list(mean = mean), na.rm = TRUE)) %>% 
+  pivot_longer(cols = starts_with('prop')) %>% 
+  
+  
+  #Plotting
+  mutate(name = str_split_i(name, "_",2)) %>% 
+  arrange(desc(value)) %>% 
+  mutate(Group = factor(native_language, levels = unique(native_language))) %>% 
+  ggplot(aes(Group, value, fill = name))+
+    geom_bar(stat = 'identity', position = 'dodge')+
+    labs(title = "L1 In Future Tense Construction Proportion", x = "Native Language (L1)", y = "Proportion", fill = "Construction") +
+    theme_minimal()
+  
+```
+
+
+
+# A Proficiency Marker
+
+
+
+
+
+
+
+
 
