@@ -82,8 +82,28 @@ tlp_text_to_df = function(x){
   
 #tokenized_df_unnested %>% write.csv('data/tokenized_df_unnested.csv')
 
-tokenized_df_unnested = read.csv('data/tokenized_df_unnested.csv')
+#tokenized_df_unnested = read.csv('data/tokenized_df_unnested.csv')
 
+```
+
+
+```{r}
+if (file.exists('data/tokenized_df_unnested.csv')){
+  tokenized_df_unnested = read.csv('data/tokenized_df_unnested.csv')
+}else{
+  # !!! WARNING - this will take about 10 - 15 !!!
+  #Create tokenized_df, each row is a token
+  tokenized_df_unnested = PELIC_compiled %>%
+   #create tokenized df from the tok_lem_POS string
+   mutate(tokenized_nested_df = map(tok_lem_POS, tlp_text_to_df)) %>%
+   #keep the unique identifier of answer id
+   select(answer_id, tokenized_nested_df) %>%
+   #make the df longer and unndest
+   unnest(tokenized_nested_df) %>%
+
+  # un-comment if you want to save
+  #tokenized_df_unnested %>% write.csv('data/tokenized_df_unnested.csv')
+}
 ```
 
 
