@@ -18,9 +18,24 @@ library(tidyverse)
 ### Load Data
 Raw data can be found [here](https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv).
 
+
+```{r}
+
+file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))
+```
+
+
 ```{r}
 #Read in Data from PELIC: 
-PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+
+if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
+  print('Reading in File from directory')
+  PELIC_compiled = read.csv(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))
+}else{
+  print('Reading in File from url')
+  PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+}
+
 nrow(PELIC_compiled)
 ncol(PELIC_compiled)
 head(PELIC_compiled)
@@ -67,31 +82,23 @@ tlp_text_to_df = function(x){
 }
 ```
 
-
-
 ```{r}
-#Create tokenized_df, each row is a token
-# tokenized_df_unnested = PELIC_compiled %>% 
-#   #create tokenized df from the tok_lem_POS string
-#   mutate(tokenized_nested_df = map(tok_lem_POS, tlp_text_to_df)) %>% 
-#   #keep the unique identifier of answer id
-#   select(answer_id, tokenized_nested_df) %>% 
-#   #make the df longer and unndest
-#   unnest(tokenized_nested_df) %>% 
-#   
-  
-#tokenized_df_unnested %>% write.csv('data/tokenized_df_unnested.csv')
-
-#tokenized_df_unnested = read.csv('data/tokenized_df_unnested.csv')
-
+getwd()
 ```
 
 
+
+
 ```{r}
-if (file.exists('data/tokenized_df_unnested.csv')){
-  tokenized_df_unnested = read.csv('data/tokenized_df_unnested.csv')
+
+if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))){
+  print('Reading in File from directory')
+  tokenized_df_unnested = read.csv(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))
 }else{
+  
+  print('Creating tokenized_df_unnested - about 10 minute runtime.')
   # !!! WARNING - this will take about 10 - 15 !!!
+  
   #Create tokenized_df, each row is a token
   tokenized_df_unnested = PELIC_compiled %>%
    #create tokenized df from the tok_lem_POS string
@@ -99,11 +106,30 @@ if (file.exists('data/tokenized_df_unnested.csv')){
    #keep the unique identifier of answer id
    select(answer_id, tokenized_nested_df) %>%
    #make the df longer and unndest
-   unnest(tokenized_nested_df) %>%
+   unnest(tokenized_nested_df)
 
   # un-comment if you want to save
-  #tokenized_df_unnested %>% write.csv('data/tokenized_df_unnested.csv')
+  #tokenized_df_unnested %>% write.csv('large_data/tokenized_df_unnested.csv')
 }
+```
+
+```{r}
+PELIC_compiled %>% 
+  filter(answer_id == 8158)
+```
+
+
+```{r}
+tokenized_df_unnested %>% 
+  filter(trimws(lemma) == "will" & trimws(token) != 'will' ) %>% 
+  count(token, lemma)
+```
+
+
+```{r}
+tokenized_df_unnested %>% 
+  filter(trimws(lemma) == "going" & trimws(token) != 'going' ) %>% 
+  count(token)
 ```
 
 
@@ -113,7 +139,7 @@ if (file.exists('data/tokenized_df_unnested.csv')){
 #Create counts_data, each row is a token
 counts_data =  tokenized_df_unnested %>% 
   #if there is a 'will' token that is a modal, put 1 in new column, else 0
-  mutate(is_will_construction = if_else(token == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
+  mutate(is_will_construction = if_else(trimws(lemma) == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
   #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
   mutate(is_goingTo_construction = 
             if_else(
@@ -174,11 +200,29 @@ countruction_counts_and_student_info_with_scores = countruction_counts_and_stude
 
 ```{r}
 countruction_counts_and_student_info_with_scores %>% 
-  write.csv('FINAL_DATA_countruction_counts_and_student_info_with_scores.csv')
+  write.csv(paste0(dirname(getwd()),'/Data Files/FINAL_DATA_countruction_counts_and_student_info_with_scores.csv'))
 ```
 
 
 My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information. The `FINAL_DATA_countruction_counts_and_student_info_with_scores.csv` is the end product of my data. 
+
+```{r}
+#In order to perform analysis on tokens later
+filtered_tokenized_data = tokenized_df_unnested %>% 
+  #if there is a 'will' token that is a modal, put 1 in new column, else 0
+  mutate(is_will_construction = if_else(trimws(lemma) == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
+  #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
+  mutate(is_goingTo_construction = 
+            if_else(
+              token == "going" & lead(token) == "to" & (
+                #lead allows to 'look ahead'
+                startsWith(trimws(lead(POS, 2)), 'V') | 
+                startsWith(trimws(lead(POS, 3)), 'V')
+              ),1,0)) %>% 
+  filter(is_will_construction | is_goingTo_construction)
+
+filtered_tokenized_data %>% write.csv(paste0(dirname(getwd()),'/Data Files/filtered_tokenized_data.csv'))
+```
 
 
 

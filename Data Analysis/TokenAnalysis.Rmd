@@ -1,0 +1,52 @@
+---
+title: "FutureTenseConstructionL2English"
+author: "Daniel Crawford"
+date: "04/02/2024"
+output: 
+  github_document: 
+    toc: TRUE
+---
+
+
+# Pull in final data
+
+
+```{r}
+#Import Packages
+library(tidyverse)
+```
+
+
+```{r}
+if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
+  print('Reading in File from directory')
+  PELIC_compiled = read.csv(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))
+}else{
+  print('Reading in File from url')
+  PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+}
+
+```
+
+```{r}
+if (file.exists(paste0(dirname(getwd()),'/Data Files/filtered_tokenized_data.csv'))){
+  print('Reading in File from directory')
+  filtered_tokenized_data = as_tibble(read.csv(paste0(dirname(getwd()),'/Data Files/filtered_tokenized_data.csv')))
+}else{
+ print('The final data dile you are looking for (filtered_tokenized_data.csv) does not appear to be in a directory.') 
+}
+```  
+
+
+```{r}
+filtered_tokenized_data %>% 
+  filter(is_goingTo_construction == 1)
+```
+
+```{r}
+PELIC_compiled %>% 
+  filter(answer_id == 440) %>%
+  pull(tok_lem_POS)
+```
+
+
