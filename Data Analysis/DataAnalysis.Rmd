@@ -7,32 +7,31 @@ output:
     toc: TRUE
 ---
 
-
-# Pull in final data
-
-
 ```{r}
 #Import Packages
 library(tidyverse)
 ```
 
+
+
+# Pull in final data
+
+## Pull in Final Data from Data Processing
 ```{r}
-
-
 if (file.exists(paste0(dirname(getwd()),'/Data Files/FINAL_DATA_countruction_counts_and_student_info_with_scores.csv'))){
   print('Reading in File from directory')
   construction_counts = as_tibble(read.csv(paste0(dirname(getwd()),'/Data Files/FINAL_DATA_countruction_counts_and_student_info_with_scores.csv')))
 }else{
  print('The final data dile you are looking for (FINAL_DATA_countruction_counts_and_student_info_with_scores.csv) does not appear to be in a directory.') 
 }
-  
-
 ```
 
+## Pull in Student Info 
 ```{r}
 student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
 ```
 
+## Pull in PELIC Compiled
 ```{r}
 if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
   print('Reading in File from directory')
@@ -48,6 +47,7 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
 # Summary Statistics
 
 ```{r}
+#Counts of Each Construction
 construction_counts %>% 
   select(count_will_construction, count_goingTo_construction) %>% 
   summarise_all(sum)
@@ -65,11 +65,12 @@ construction_props
 
 ```
 
-
+## Distributions of Scores
 ```{r}
-#Raw Distributuion of Scores
+#Visualize Raw Distribution of Scores
 
 construction_props %>% 
+  #only use scores
   select(LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
   pivot_longer(everything()) %>% 
   ggplot(aes(x = value)) +
@@ -81,6 +82,7 @@ construction_props %>%
 
 
 construction_props %>% 
+  #only check writing samples
   select(Writing_Sample) %>% 
   pivot_longer(everything()) %>% 
   ggplot(aes(x = value)) +
@@ -96,10 +98,10 @@ construction_props %>%
 
 
 
-
+## Scale Proficiency Scores
 
 ```{r}
-#Correlation of Proficiency Scores:
+#Scale Scores
 
 scaled_construction_props = construction_props %>% 
   select(anon_id, prop_will_construction, prop_goingTo_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
@@ -111,6 +113,8 @@ scaled_construction_props
 
 
 ```{r}
+
+#Get Scaled values, but only for students who used future tense at least 30 times. 
 
 scaled_construction_props_30plus = construction_counts %>% 
   filter(count_will_construction+count_goingTo_construction >= 30) %>% 
@@ -124,10 +128,7 @@ scaled_construction_props_30plus
 ```
 
 
-```{r}
-construction_props %>% 
-  select(anon_id, prop_will_construction, prop_goingTo_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample)
-```
+
 
 
 
@@ -249,7 +250,7 @@ scaled_construction_props_30plus_withL1 %>% count(native_language)
 ```
 
 
-
+## Correlations For each L1
 
 ```{r}
 create_corr_diagram(
@@ -297,6 +298,7 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv')
 ```
 
 ```{r}
+#Join in information for each token
 all_data = tokenized_df_unnested %>% 
   left_join(PELIC_compiled, by = 'answer_id') %>% 
   left_join(student_info, by = 'anon_id') %>% 
@@ -307,6 +309,7 @@ all_data = tokenized_df_unnested %>%
 
 
 ```{r}
+#Using the smae filtes as in data processing, get only the future tokens
 future_tokens_data = all_data %>% 
   mutate(is_will_construction = if_else(trimws(lemma) == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
   #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
@@ -323,42 +326,84 @@ future_tokens_data = all_data %>%
 future_tokens_data
 ```
 
-```{r}
-future_tokens_data %>% count(level_id)
-```
 
-
+### Predict 'will' with Mean of Prof Scores using Random Intercepts
 
 ```{r}
-intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + mean_prof_score, data = future_tokens_data)
+mean_prof_score.intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + mean_prof_score, data = future_tokens_data)
 
-model_coefs = coef(intercepts_model)$anon_id %>% 
+mean_prof_score.intercepts_model.coefs = coef(mean_prof_score.intercepts_model)$anon_id %>% 
+  #Change names to interpres
   rename(Intercept = `(Intercept)`, Slope = mean_prof_score) %>% 
   rownames_to_column("anon_id")
 
-model_coefs
+mean_prof_score.intercepts_model.coefs
 
 ```
+#### Visualize by Native Languages
 
 ```{r}
-model_coefs %>% 
+mean_prof_score.intercepts_model.coefs %>% 
+  #Bring in student info
   left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
-  group_by(native_language) %>% 
-  filter(n()>30) %>% 
+  #Only use L1s with at least 30 students
+  group_by(native_language) %>% filter(n()>30) %>% 
   left_join(future_tokens_data %>% select(anon_id, mean_prof_score), by = 'anon_id') %>% 
   ggplot()+
   geom_point(aes(x = mean_prof_score, y = Intercept)) +
   facet_wrap(~ native_language)
 
-model_coefs %>% 
+mean_prof_score.intercepts_model.coefs %>% 
+  #Bring in student info
   left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
-  group_by(native_language) %>% 
-  filter(n()>30) %>% 
+   #Only use L1s with at least 30 students
+  group_by(native_language) %>% filter(n()>30) %>% 
   left_join(future_tokens_data %>% select(anon_id, mean_prof_score), by = 'anon_id') %>% 
   ggplot()+
   geom_boxplot(aes(x = native_language, y = Intercept))
 ```
 
+
+### Predict 'will' with Mean of Prof Scores using Random Intercepts and Random Slopes
+
+```{r}
+mean_prof_score.random_slope_and_intercepts_model <- lmer(is_will_construction ~ mean_prof_score + (1 + mean_prof_score | anon_id), data = future_tokens_data)
+
+summary(mean_prof_score.random_slope_and_intercepts_model)
+
+mean_prof_score.random_slope_and_intercepts_model.coefs = coef(mean_prof_score.random_slope_and_intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+
+
+
+mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
+  distinct() %>%
+  ggplot()+
+  geom_point(aes(Intercept, mean_prof_score, color = level_id))+
+  facet_wrap(~level_id)+
+  labs(title = 'Intercept and Coefficient of Mean Proficency Score by Level')
+```
+
+
+
+```{r}
+
+#ANOVA for Intercepts
+print('ANOVA for Intercepts by Level')
+summary(aov(Intercept ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
+  distinct()))
+
+print('ANOVA for Slopes by Level')
+summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
+  distinct()))
+
+
+```
+### Predict 'will' with Years of English Learning using Random Intercepts
 
 ```{r}
 yrs_learning_eng_intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + yrs_of_english_learning , data = future_tokens_data)
@@ -371,41 +416,9 @@ yrs_learning_eng_model_coefs %>%
   left_join(student_info %>% select(anon_id, yrs_of_english_learning, native_language), by = 'anon_id') %>% 
   group_by(native_language) %>% filter(n()>30) %>% 
   ggplot()+
-  geom_boxplot(aes(x = yrs_of_english_learning, y = Intercept)) +
-  facet_wrap(~native_language)
+  geom_boxplot(aes(x = yrs_of_english_learning, y = Intercept))
 ```
-
-```{r}
-yrs_in_english_environment_intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + yrs_in_english_environment , data = future_tokens_data)
-
-yrs_in_english_environment_model_coefs = coef(yrs_in_english_environment_intercepts_model)$anon_id %>% 
-  rename(Intercept = `(Intercept)`) %>% 
-  rownames_to_column("anon_id")
-
-yrs_in_english_environment_model_coefs %>% 
-  left_join(student_info %>% select(anon_id, yrs_in_english_environment, native_language), by = 'anon_id') %>% 
-  group_by(native_language) %>% filter(n()>30) %>% 
-  ggplot()+
-  geom_boxplot(aes(x = yrs_in_english_environment, y = Intercept)) +
-  facet_wrap(~native_language)
-```
-
-
-```{r}
-time_eng_intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + yrs_in_english_environment +  yrs_of_english_learning, data = future_tokens_data)
-
-time_eng_model_coefs = coef(time_eng_intercepts_model)$anon_id %>% 
-  rename(Intercept = `(Intercept)`) %>% 
-  rownames_to_column("anon_id")
-
-yrs_in_english_environment_model_coefs %>% 
-  left_join(student_info %>% select(anon_id, yrs_in_english_environment, native_language, yrs_of_english_learning), by = 'anon_id') %>% 
-  group_by(native_language) %>% filter(n()>30) %>% 
-  ggplot()+
-  geom_boxplot(aes(x = yrs_in_english_environment, y = Intercept)) +
-  facet_wrap(~yrs_of_english_learning)
-```
-
+### Predict 'will' with Level using Random Intercepts
 
 ```{r}
 level_id.intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + level_id, data = future_tokens_data %>% mutate(level_id = factor(level_id)))
@@ -423,16 +436,22 @@ level_id.model_coefs %>%
   geom_boxplot(aes(x = factor(level_id), y = Intercept)) + 
   labs(x = "ELI Level", y = "Random Speaker Intercept", title = "Effects of ELI Level on Speaker Intercept")
 ```
-
+#### ANOVA of Prediction 'will' with Level Id using Random Intercepts
 ```{r}
-t = level_id.model_coefs %>% 
+summary(aov(Intercept ~ level_id, data = level_id.model_coefs %>% 
   select(anon_id,Intercept) %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
   mutate(level_id = factor(level_id)) %>% 
-  distinct()
-
-summary(aov(Intercept ~ level_id, data = t))
+  distinct()))
 ```
+
+
+
+
+
+
+
+
 ## Token Context Analysis
 
 ```{r}
@@ -455,6 +474,9 @@ tokenized_df_unnested %>%
     'NotV')) %>% 
  
   filter(trimws(lemma) == 'will' & trimws(POS) == 'MD') %>% 
+  mutate(will_next_V_code = if_else(
+    startsWith(trimws(will_next_V_code),'V'), will_next_V_code,'Other_NonV' 
+  )) %>% 
   count(will_next_V_code)
 ```
 
