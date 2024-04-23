@@ -304,6 +304,8 @@ all_data = tokenized_df_unnested %>%
 ```
 
 
+
+
 ```{r}
 future_tokens_data = all_data %>% 
   mutate(is_will_construction = if_else(trimws(lemma) == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
@@ -316,10 +318,16 @@ future_tokens_data = all_data %>%
                 startsWith(trimws(lead(POS, 3)), 'V')
               ),1,0)) %>% 
   filter(is_goingTo_construction == 1 | is_will_construction == 1) %>% 
-  mutate(mean_prof_score = rowMeans(select(.,LCT_Score, MTELP_Conv_Score, Writing_Sample), na.rm = T))
+  mutate(mean_prof_score = rowMeans(select(.,LCT_Score, MTELP_Conv_Score, Writing_Sample), na.rm = T)) 
 
 future_tokens_data
 ```
+
+```{r}
+future_tokens_data %>% count(level_id)
+```
+
+
 
 ```{r}
 intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + mean_prof_score, data = future_tokens_data)
@@ -341,5 +349,135 @@ model_coefs %>%
   ggplot()+
   geom_point(aes(x = mean_prof_score, y = Intercept)) +
   facet_wrap(~ native_language)
+
+model_coefs %>% 
+  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
+  group_by(native_language) %>% 
+  filter(n()>30) %>% 
+  left_join(future_tokens_data %>% select(anon_id, mean_prof_score), by = 'anon_id') %>% 
+  ggplot()+
+  geom_boxplot(aes(x = native_language, y = Intercept))
+```
+
+
+```{r}
+yrs_learning_eng_intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + yrs_of_english_learning , data = future_tokens_data)
+
+yrs_learning_eng_model_coefs = coef(yrs_learning_eng_intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+
+yrs_learning_eng_model_coefs %>% 
+  left_join(student_info %>% select(anon_id, yrs_of_english_learning, native_language), by = 'anon_id') %>% 
+  group_by(native_language) %>% filter(n()>30) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = yrs_of_english_learning, y = Intercept)) +
+  facet_wrap(~native_language)
+```
+
+```{r}
+yrs_in_english_environment_intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + yrs_in_english_environment , data = future_tokens_data)
+
+yrs_in_english_environment_model_coefs = coef(yrs_in_english_environment_intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+
+yrs_in_english_environment_model_coefs %>% 
+  left_join(student_info %>% select(anon_id, yrs_in_english_environment, native_language), by = 'anon_id') %>% 
+  group_by(native_language) %>% filter(n()>30) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = yrs_in_english_environment, y = Intercept)) +
+  facet_wrap(~native_language)
+```
+
+
+```{r}
+time_eng_intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + yrs_in_english_environment +  yrs_of_english_learning, data = future_tokens_data)
+
+time_eng_model_coefs = coef(time_eng_intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+
+yrs_in_english_environment_model_coefs %>% 
+  left_join(student_info %>% select(anon_id, yrs_in_english_environment, native_language, yrs_of_english_learning), by = 'anon_id') %>% 
+  group_by(native_language) %>% filter(n()>30) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = yrs_in_english_environment, y = Intercept)) +
+  facet_wrap(~yrs_of_english_learning)
+```
+
+
+```{r}
+level_id.intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + level_id, data = future_tokens_data %>% mutate(level_id = factor(level_id)))
+
+level_id.intercepts_model
+
+level_id.model_coefs = coef(level_id.intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+
+level_id.model_coefs %>% 
+  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+  ggplot()+
+  geom_boxplot(aes(x = factor(level_id), y = Intercept)) + 
+  labs(x = "ELI Level", y = "Random Speaker Intercept", title = "Effects of ELI Level on Speaker Intercept")
+```
+
+```{r}
+t = level_id.model_coefs %>% 
+  select(anon_id,Intercept) %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+  mutate(level_id = factor(level_id)) %>% 
+  distinct()
+
+summary(aov(Intercept ~ level_id, data = t))
+```
+## Token Context Analysis
+
+```{r}
+future_tokens_data
+```
+
+```{r}
+tokenized_df_unnested %>% 
+  mutate(will_next_V_code = if_else(
+    trimws(lemma) == 'will' & trimws(POS) == 'MD', 
+    if_else(
+      startsWith(trimws(lead(POS)),'V'),
+      lead(POS),
+      if_else(
+        startsWith(trimws(lead(POS,2)),'V'),
+        lead(POS,2),
+        lead(POS,3)
+      )
+    ),
+    'NotV')) %>% 
+ 
+  filter(trimws(lemma) == 'will' & trimws(POS) == 'MD') %>% 
+  count(will_next_V_code)
+```
+
+```{r}
+tokenized_df_unnested %>% 
+  mutate(goingTo_next_V_code = if_else(
+      token == "going" & lead(token) == "to" & (
+        #lead allows to 'look ahead'
+        startsWith(trimws(lead(POS, 2)), 'V') | 
+        startsWith(trimws(lead(POS, 3)), 'V')),
+      
+    if_else(
+      startsWith(trimws(lead(POS)),'V'),
+      lead(POS),
+      if_else(
+        startsWith(trimws(lead(POS,2)),'V'),
+        lead(POS,2),
+        lead(POS,3)
+      )
+    ),
+    'NotV')) %>% 
+ 
+  filter(token == "going" & lead(token) == "to") %>% 
+  count(goingTo_next_V_code)
 ```
 
