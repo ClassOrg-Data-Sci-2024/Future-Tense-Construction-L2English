@@ -19,7 +19,7 @@ Juffs, A., Han, N-R., & Naismith, B. (2020). The University of Pittsburgh Englis
 ## Project Directory Navigation
 
 -   [**final_report.md**](/final_report.md): The final report for this project, including background information, results, and discussion
--   [Data Processing](/Data Processing): Sub-directory to hold main data processing files
+-   [Data Processing](/Data Processing/): Sub-directory to hold main data processing files
     -   [DataProcessing.Rmd](/Data Processing/DataProcessing.Rmd): Data Processing Pipeline. ([Knitted](/Data Processing/DataProcessing.md))
 -   [Data Analysis](/Data Analysis): Sub-directory to hold main data analysis files
     -   [DataAnalysis.Rmd](/Data Analysis/DataAnalysis.Rmd): Data Analyses: Correlation, Mixed Effects Models, Random Intercept Models ([Knitted](/Data Analysis/DataAnalysis.md))
