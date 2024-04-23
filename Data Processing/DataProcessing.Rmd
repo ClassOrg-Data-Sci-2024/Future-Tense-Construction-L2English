@@ -15,16 +15,10 @@ EXISTING
 library(tidyverse)
 ```
 
-### Load Data
+## Load Data
 Raw data can be found [here](https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv).
 
-
-```{r}
-
-file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))
-```
-
-
+### Read in Data from PELIC
 ```{r}
 #Read in Data from PELIC: 
 
@@ -41,10 +35,10 @@ ncol(PELIC_compiled)
 head(PELIC_compiled)
 ```
 
-The data contains about 46,000 entries, and a vast about of background data on the students. Of note will be L1, level, and profiency. 
+The data contains about 46,000 entries, and a vast about of background data on the students. Of note will be L1, level, and scores on proficiency measures. 
 
 
-
+### Read in Student Indo
 ```{r}
 #Need to get demographic and proficiency scores for each student
 
@@ -57,6 +51,10 @@ head(student_info)
 
 The student information for the 1,313 students expands on the demographics, and will be joined in later to the data. 
 
+
+## Tokenize Data
+
+### Tokenize Lemmatized Data Helper Function
 ```{r}
 #A function to create a tokenized df with columns: token | lemma | POS
 #Input is a string
@@ -82,15 +80,8 @@ tlp_text_to_df = function(x){
 }
 ```
 
-```{r}
-getwd()
-```
-
-
-
 
 ```{r}
-
 if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))){
   print('Reading in File from directory')
   tokenized_df_unnested = read.csv(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))
@@ -113,27 +104,24 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv')
 }
 ```
 
-```{r}
-PELIC_compiled %>% 
-  filter(answer_id == 8158)
-```
+## Summary of Data 
 
-
+### Summary of 'will' tokens
 ```{r}
 tokenized_df_unnested %>% 
   filter(trimws(lemma) == "will" & trimws(token) != 'will' ) %>% 
   count(token, lemma)
 ```
 
-
+### Summary of 'going' tokens
 ```{r}
 tokenized_df_unnested %>% 
-  filter(trimws(lemma) == "going" & trimws(token) != 'going' ) %>% 
+  filter(trimws(lemma) == "go" & trimws(token) != 'going' ) %>% 
   count(token)
 ```
+Note that not all of these are of the 'going to' future construction
 
-
-### Format the Data 
+## Format the Data 
 ```{r}
 
 #Create counts_data, each row is a token
@@ -176,7 +164,7 @@ countruction_counts_and_student_info  = PELIC_compiled %>%
         
 ```
 
-
+### Bring in score data
 
 ```{r}
 #score Data
@@ -196,7 +184,7 @@ countruction_counts_and_student_info_with_scores = countruction_counts_and_stude
 
 
 
-
+### Save The data
 
 ```{r}
 countruction_counts_and_student_info_with_scores %>% 
@@ -204,7 +192,8 @@ countruction_counts_and_student_info_with_scores %>%
 ```
 
 
-My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information. The `FINAL_DATA_countruction_counts_and_student_info_with_scores.csv` is the end product of my data. 
+My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information
+
 
 ```{r}
 #In order to perform analysis on tokens later
@@ -229,7 +218,7 @@ filtered_tokenized_data %>% write.csv(paste0(dirname(getwd()),'/Data Files/filte
 
 
 
-# Session Info
+## Session Info
 ```{r}
 sessionInfo()
 ```
