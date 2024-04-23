@@ -29,6 +29,21 @@ if (file.exists(paste0(dirname(getwd()),'/Data Files/FINAL_DATA_countruction_cou
 
 ```
 
+```{r}
+student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
+```
+
+```{r}
+if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
+  print('Reading in File from directory')
+  PELIC_compiled = read.csv(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))
+}else{
+  print('Reading in File from url')
+  PELIC_compiled = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv"), fileEncoding = "ISO-8859-1"))
+}
+
+```
+
 
 # Summary Statistics
 
@@ -256,7 +271,75 @@ create_corr_diagram(
 ```
 # Random Intercepts Analysis
 
-```{r}
+## Token Level Analysis
 
+```{r}
+if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))){
+  print('Reading in File from directory')
+  tokenized_df_unnested = read.csv(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))
+}else{
+  
+  print('Creating tokenized_df_unnested - about 10 minute runtime.')
+  # !!! WARNING - this will take about 10 - 15 !!!
+  
+  #Create tokenized_df, each row is a token
+  tokenized_df_unnested = PELIC_compiled %>%
+   #create tokenized df from the tok_lem_POS string
+   mutate(tokenized_nested_df = map(tok_lem_POS, tlp_text_to_df)) %>%
+   #keep the unique identifier of answer id
+   select(answer_id, tokenized_nested_df) %>%
+   #make the df longer and unndest
+   unnest(tokenized_nested_df)
+
+  # un-comment if you want to save
+  #tokenized_df_unnested %>% write.csv('large_data/tokenized_df_unnested.csv')
+}
+```
+
+```{r}
+all_data = tokenized_df_unnested %>% 
+  left_join(PELIC_compiled, by = 'answer_id') %>% 
+  left_join(student_info, by = 'anon_id') %>% 
+  left_join(scaled_construction_props, by = 'anon_id')
+```
+
+
+```{r}
+future_tokens_data = all_data %>% 
+  mutate(is_will_construction = if_else(trimws(lemma) == 'will' & trimws(POS) == 'MD', 1,0)) %>% 
+  #if there is a 'going' token followed by 'to' then a verb within 2 words, put 1 in new column
+  mutate(is_goingTo_construction = 
+            if_else(
+              token == "going" & lead(token) == "to" & (
+                #lead allows to 'look ahead'
+                startsWith(trimws(lead(POS, 2)), 'V') | 
+                startsWith(trimws(lead(POS, 3)), 'V')
+              ),1,0)) %>% 
+  filter(is_goingTo_construction == 1 | is_will_construction == 1) %>% 
+  mutate(mean_prof_score = rowMeans(select(.,LCT_Score, MTELP_Conv_Score, Writing_Sample), na.rm = T))
+
+future_tokens_data
+```
+
+```{r}
+intercepts_model <- lmer(is_will_construction ~ (1 | anon_id) + mean_prof_score, data = future_tokens_data)
+
+model_coefs = coef(intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`, Slope = mean_prof_score) %>% 
+  rownames_to_column("anon_id")
+
+model_coefs
+
+```
+
+```{r}
+model_coefs %>% 
+  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
+  group_by(native_language) %>% 
+  filter(n()>30) %>% 
+  left_join(future_tokens_data %>% select(anon_id, mean_prof_score), by = 'anon_id') %>% 
+  ggplot()+
+  geom_point(aes(x = mean_prof_score, y = Intercept)) +
+  facet_wrap(~ native_language)
 ```
 
