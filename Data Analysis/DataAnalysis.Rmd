@@ -134,55 +134,67 @@ scaled_construction_props_30plus %>%
 
 
 ```{r}
-cm = as_tibble(cor(scaled_construction_props_30plus %>%  
+create_corr_diagram = function(scaled_construction_props_30plus, title_str){
+  
+  cm = as_tibble(cor(scaled_construction_props_30plus %>%  
            filter(!is.na(prop_will_construction)) %>%
            select(prop_will_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample)))
+  
+  
 
-cm %>% 
-  mutate(score = rownames(cm)) %>%
-  pivot_longer(!score) %>%
-  mutate(value = round(value,2)) %>% 
-  
-  ggplot(aes(x = score, y = name, fill = value)) +
-  
-  geom_tile(color = "white") +
-  scale_fill_gradient2(
-    low = "blue",
-    high = "red",
-    mid = "white",
-    midpoint = 0,
-    limit = c(-1, 1),
-    space = "Lab",
-    name = "Pearson\nCorrelation"
-  ) +
-  theme_minimal() + # minimal theme
-  theme(axis.text.x = element_text(
-    angle = 45,
-    vjust = 1,
-    size = 12,
-    hjust = 1
-  )) +
-  coord_fixed() +
-  geom_text(aes(score, name, label = value),
-            color = "black",
-            size = 4) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_blank(),
-    axis.ticks = element_blank(),
-    legend.justification = c(1, 0),
-    legend.direction = "horizontal"
-  ) +
-  guides(fill = guide_colorbar(
-    barwidth = 7,
-    barheight = 1,
-    title.position = "top",
-    title.hjust = 0.5
-  ))+
-  labs(title = "Scaled Proficiency Scores Correlation (30 plus)")
+  cm %>% 
+    mutate(score = colnames(cm)) %>%
+    pivot_longer(!score) %>%
+    mutate(value = round(value,2)) %>% 
+    
+    ggplot(aes(x = score, y = name, fill = value)) +
+    
+    geom_tile(color = "white") +
+    scale_fill_gradient2(
+      low = "blue",
+      high = "red",
+      mid = "white",
+      midpoint = 0,
+      limit = c(-1, 1),
+      space = "Lab",
+      name = "Pearson\nCorrelation"
+    ) +
+    theme_minimal() + # minimal theme
+    theme(axis.text.x = element_text(
+      angle = 45,
+      vjust = 1,
+      size = 12,
+      hjust = 1
+    )) +
+    coord_fixed() +
+    geom_text(aes(score, name, label = value),
+              color = "black",
+              size = 4) +
+    theme(
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.border = element_blank(),
+      panel.background = element_blank(),
+      axis.ticks = element_blank(),
+      legend.justification = c(1, 0),
+      legend.direction = "horizontal"
+    ) +
+    guides(fill = guide_colorbar(
+      barwidth = 7,
+      barheight = 1,
+      title.position = "top",
+      title.hjust = 0.5
+    ))+
+    labs(title = paste0("Scaled Proficiency Scores Correlation (30 plus) - ",title_str))
+    
+}
+```
+
+
+
+```{r}
+create_corr_diagram(scaled_construction_props_30plus, "All Langs")
 ```
 
 
@@ -211,30 +223,40 @@ construction_props %>%
   
 ```
 
+
 ```{r}
-construction_props %>% 
-  select(anon_id, prop_will_construction, prop_goingTo_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample, native_language) %>% 
-  mutate(across(-c(anon_id,prop_will_construction, prop_goingTo_construction, native_language), ~ scale(.x))) %>% 
+scaled_construction_props_30plus_withL1 = scaled_construction_props_30plus %>% 
+  left_join(construction_counts %>% select(anon_id, native_language), by = 'anon_id') %>% 
   group_by(native_language) %>% 
-  filter(n()>30) %>% 
-  summarise(across(.cols = where(is.numeric),.fns = cor))
+  filter(n()>10)
+
+scaled_construction_props_30plus_withL1 %>% count(native_language)
 ```
+
+
+
+
+```{r}
+create_corr_diagram(
+  scaled_construction_props_30plus_withL1 %>% filter(native_language == 'Arabic') %>% ungroup() %>%  select(-native_language,-anon_id), "Arabic")
+
+create_corr_diagram(
+  scaled_construction_props_30plus_withL1 %>% filter(native_language == 'Chinese') %>% ungroup() %>%  select(-native_language,-anon_id), "Chinese")
+
+create_corr_diagram(
+  scaled_construction_props_30plus_withL1 %>% filter(native_language == 'Japanese') %>% ungroup() %>%  select(-native_language,-anon_id), "Japanese")
+
+create_corr_diagram(
+  scaled_construction_props_30plus_withL1 %>% filter(native_language == 'Korean') %>% ungroup() %>%  select(-native_language,-anon_id), "Korean")
+
+create_corr_diagram(
+  scaled_construction_props_30plus_withL1 %>% filter(native_language == 'Thai') %>% ungroup() %>%  select(-native_language,-anon_id), "Thai")
+
+
+```
+# Random Intercepts Analysis
 
 ```{r}
 
 ```
-
-
-```{r}
-cor(
-  scaled_construction_props_30plus %>% 
-  left_join(
-    construction_counts %>% select(anon_id, native_language),
-    by = 'anon_id'
-  ) %>%  
-   filter(!is.na(prop_will_construction)) %>%
-   select(prop_will_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample))
-```
-
-
 
