@@ -1,0 +1,25 @@
+
+
+Text length model
+
+```{r}
+text_len.intercepts_model <- lmer(is_will_construction ~ text_len + (1 + text_len | anon_id), data = future_tokens_data %>% mutate(text_len = scale(text_len)))
+
+text_len.intercepts_model
+
+text_len.model_coefs = coef(text_len.intercepts_model)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+
+text_len.model_coefs %>% 
+  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
+  left_join(future_tokens_data %>% select(anon_id, text_len, level_id), by = 'anon_id') %>% 
+  ggplot()+
+  geom_point(aes(x = text_len.y, y = Intercept))+
+  facet_wrap(~level_id)
+
+
+```
+
+
+
