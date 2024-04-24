@@ -224,17 +224,13 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/future_tokens_data.csv'))){
 ```
 
 
-```{r}
-mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
-  distinct() %>% count(level_id)
-```
+
 
 
 
 ### Predict 'will' with Mean of Prof Scores using Random Intercepts and Random Slopes
 
-```{r, label = 'randIntrandSlopes'}
+```{r, label = 'randIntrandSlopesprof'}
 mean_prof_score.random_slope_and_intercepts_model <- lmer(is_will_construction ~ mean_prof_score + (1 + mean_prof_score | anon_id), data = future_tokens_data)
 
 summary(mean_prof_score.random_slope_and_intercepts_model)
@@ -271,6 +267,13 @@ mean_prof_score.random_slope_and_intercepts_model.coefs %>%
   labs(x = 'Level', title = 'Slopes by Level ID', y = 'Slope')
 
 ```
+```{r, label = 'countInLevel'}
+mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
+  distinct() %>% count(level_id)
+```
+
+
 #### ANOVAs for Random Intercepts and Random Slopes by Level
 
 ```{r}
@@ -299,7 +302,7 @@ summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_
 ```
 #### Without Level 2
 
-```{r, label = 'randIntrandSlopes'}
+```{r, label = 'randIntrandSlopeswoLv2'}
 mean_prof_score.random_slope_and_intercepts_model.woL2 <- lmer(is_will_construction ~ mean_prof_score + (1 + mean_prof_score | anon_id), data = future_tokens_data %>% filter(level_id != 2))
 
 summary(mean_prof_score.random_slope_and_intercepts_model.woL2)
@@ -334,7 +337,7 @@ summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_
 
 ### Predict 'will' with Level using Random Intercepts and Random Slopes
 
-```{r, label = 'randIntSloLevel'}
+```{r, label = 'randIntSloLevelWoLv2'}
 level_id.intercepts_and_slope_model <- lmer(is_will_construction ~ level_id + (1 + level_id | anon_id), data = future_tokens_data   %>% mutate(level_id = level_id-2))
 
 summary(level_id.intercepts_and_slope_model)
@@ -399,7 +402,8 @@ longit_score_data = score_data %>%
   
 ```
 
-```{r, longAnProf}
+```{r, label = 'longAnProf'}
+
 future_tokens_data %>% 
   inner_join(longit_score_data, by = c('anon_id','semester')) %>% 
   distinct() %>% 
@@ -416,12 +420,9 @@ future_tokens_data %>%
   geom_point() + geom_line()+
   labs(title = 'Longitudinal Proficiency Increase', x = 'Year',y = 'Mean Proficiency Score (scaled)', color = 'Student (ID)')
   
-  
-  
-  
 ```
 
-```{r, longAnWill}
+```{r, label = 'longAnWill'}
 future_tokens_data %>% 
   inner_join(longit_score_data, by = c('anon_id','semester')) %>% 
   distinct() %>% 

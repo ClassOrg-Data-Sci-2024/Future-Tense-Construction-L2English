@@ -30,7 +30,7 @@ The data utilized to suggest an answer to this question comes from the Universit
 
 ### Methods
 
-The goal of this project was to understand the role of proficiency in future tense construction preference. The methods selected captured the effects of proficiency score on whether a speaker would use will or going to in a particular token. That is, a token-level analysis was conducted.
+This project aimed to understand the role of proficiency in future tense construction preference. The methods selected captured the effects of proficiency score on whether a speaker would use will or going to in a particular token. That is, a token-level analysis was conducted.
 
 Proficiency was measured as the mean of the following scores z-scored normalized:
 
@@ -38,7 +38,7 @@ Proficiency was measured as the mean of the following scores z-scored normalized
 -   `Writing_Sample`: an ELI (English Language Institute) writing test
 -   `MTELP_Conv_Score`: combined score from the Michigan Test of English Language Proficiency.
 
-(Raw scores were provided in the data set.) Proficisency was also operationalized by the level of course the student was in:
+(Raw scores were provided in the data set.) Proficiency was also operationalized by the course level, the student was in:
 
 -   `2`: Pre-Intermediate
 -   `3`: Intermediate
@@ -55,31 +55,55 @@ Students who took more than one set of proficiency (3%) exams were excluded from
 
 In the corpus, 18,490 instances of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%). The vast majority (98.75%) of verbs that follow `will` are of the base form, as are (98.62%) of verbs following the `going to` construction. This suggests that the context of the sentence, as of the current part-of-speech tagging scheme, will be unlikely to hold explanatory power. There were 23 stunts in Level 2, 394 in Level 3, 709 in Level 4, and 430 in Level 3; this imbalance is addressed.
 
-A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an anlayis would also become statistically problematic if predictions of the *proportion* of times a student would use one constuction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.
+A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an analysis would also become statistically problematic if predictions of the *proportion* of times a student would use one construction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.
 
-![Figure 1. Each Proficency Score and Percentage of `will` Construction](/images/DataAnalysis-corrAn-1.png)
+![Figure 1. Each Proficency Score and Percentage of will Construction](/images/DataAnalysis-corrAn-1.png) 
+
+Figure 1. Each Proficiency Score and Percentage of `will` Construction
 
 Conducting a random effects model, with random slopes and random intercepts that predicts whether a instance of future tense construction will use the `will` or `going to` variant (with `will` being a value of 1 and `going to` a value of 0), proficiency is found to be a significant (t = 2.871, F = 8.2417) predictor of construction preference.
 
 Further, Figure 2 shows that the random intercepts found by the model vary in distribution significantly (p = 0.00829), as do the slopes (p \< 0.001) found by the model, shown in Figure 4.
 
-![Figure 2. Boxplot of Intercepts predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png)
+![Figure 2. Boxplot of Intercepts predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png) 
 
-![Figure 3. Boxplot of Slopes predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)
+Figure 2. Boxplot of Intercepts predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model
+
+![Figure 3. Boxplot of Slopes predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png) 
+
+Figure 3. Boxplot of Slopes predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model
 
 Because there was steep imbalance in the number of students in level 2 the same model was run excluding these students. This model (t = 2.381, F = 5.6702) also found that slope was a significant predictor, when comparing levels 3 and higher (p = 0.002), but Intercepts were not found to vary significantly by level (p = 0.20), in the model that used proficiency to predict future tense construction.
 
 A similar analysis was conducted on the effects of the level of the students. The course level the student was in was also found to be a significant (t = 2.791, F = 7.791) predictor of preference for construction. The resulting Intercepts and slopes are shown in Figure 4 and Figure 5, respectively. When Level 2 students were removed from the model, the results hold (t = 2.339, F = 5.4712), that Level is a significant predictor
 
-![Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplot-1.png)
+![Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplot-1.png) 
 
-![Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png)
+Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model
+
+![Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png) 
+
+Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model
+
+#### Longitudinal Analysis
+
+A qualitative longitudinal analysis was performed with only a few students with scores provided for multiple semesters. Figure 6 indicates a generally positive trend in students' proficiency scores. This is intuitive, as proficiency naturally increases with time of study. However, there does not seem to be a clear trend of student decreasing the use of the `will` construction, with four of the seven students actually utilizing `going to` more in later semesters.
+
+![Figure 6. Students Longitudinal Proficiency](/images/DataAnalysis-longAnProf-1.png) 
+
+Figure 6. Students Longitudinal Proficiency
+
+![Figure 7. Student Longitudinal Preference for 'will' Construction](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png) 
+
+Figure 7. Student Longitudinal Preference for 'will' Construction
 
 ## Discussion
 
 The models suggest a meaningful difference in what construction will be used based on the proficiency metric utilized (the mean of three independent tests.) With an increase in the intercepts, which can be interpreted as the base probability that the `will` construction will be used, it seems that the `will` construction will increase over time. Furthermore, because the model utilized random slopes, the level at which the students were associated with the proficiency exam seems to influence their rate of increase in the wall construction. However, after the pre-intermediate, there does not seem to be significant variation in *Intercepts* that can be attributed to Level. This suggests a learning period for students to use either construction. The slope, which captures the effect of proficiency, still varies significantly by level.
 
 Naturally, students' proficiency will correspond to their placement in a course level. This is confirmed by a second set of models, indicating that Level is a significant predictor of the `will` construction use. This suggests that the level of instruction plays a major role in the construction the students will utilize.
+
+The qualitative longitudinal analysis does suggests that, while most students will increase their mean proficiency scores, some will increase their use of `going to` over will in the constructions. With more data, more patters may emerge, however, it is possible that an increase in proficiency corresponds to an increase in flexibility.
 
 ## Conclusion
 
