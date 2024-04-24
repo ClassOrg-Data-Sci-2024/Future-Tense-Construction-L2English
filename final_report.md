@@ -32,13 +32,25 @@ The data utilized to suggest an answer to this question comes from the Universit
 
 The goal of this project was to understand the role of proficiency in future tense construction preference. The methods selected captured the effects of proficiency score on whether a speaker would use will or going to in a particular token. That is, a token-level analysis was conducted.
 
-Proficiency was measured as the mean of the following scores z-scored normalized: - `LCT_Score`: an ELI (English Language Institute) listening test - `Writing_Sample`: an ELI (English Language Institute) writing test - `MTELP_Conv_Score`: combined score from the Michigan Test of English Language Proficiency.
+Proficiency was measured as the mean of the following scores z-scored normalized:
+
+-   `LCT_Score`: an ELI (English Language Institute) listening test
+-   `Writing_Sample`: an ELI (English Language Institute) writing test
+-   `MTELP_Conv_Score`: combined score from the Michigan Test of English Language Proficiency.
 
 (Raw scores were provided in the data set.)
 
 Each occurrence of a `will` or `going to` construction was treated as an individual observation. Then, considering each student as a 'group' whose members are the tokens of future construction, a mixed effects model was fit. This method selection is in accordance with research on language variation and change, which suggests that meaningful insights are contained in random intercepts of random effects models (Drager & Hay 2012).
 
+Students who took more than one set of proficiency (3%) exams were excluded from the main analysis, and had a seperate longitudinal analysis conducted on their data points.
+
 ## Results
+
+In the corpus, 18,490 instances of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%).
+
+Conducting a random effects model, with random slopes and random intercepts that predicts whether a
+
+![pic](/images/DataAnalysis-randIntLevel-1.png)
 
 ## Discussion
 
