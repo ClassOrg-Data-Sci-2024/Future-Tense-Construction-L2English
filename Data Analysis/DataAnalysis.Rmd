@@ -61,6 +61,7 @@ construction_counts %>%
 
 
 
+
 ```{r, label = 'getProportions'}
 #Get proportions
 construction_props = construction_counts %>% 
@@ -223,6 +224,11 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/future_tokens_data.csv'))){
 ```
 
 
+```{r}
+mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
+  distinct() %>% count(level_id)
+```
 
 
 
@@ -267,6 +273,12 @@ mean_prof_score.random_slope_and_intercepts_model.coefs %>%
 ```
 #### ANOVAs for Random Intercepts and Random Slopes by Level
 
+```{r}
+anova(mean_prof_score.random_slope_and_intercepts_model)
+```
+
+
+
 ```{r, label = 'anovaInts'}
 
 #ANOVA for Intercepts
@@ -285,13 +297,45 @@ summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_
 
 
 ```
+#### Without Level 2
+
+```{r, label = 'randIntrandSlopes'}
+mean_prof_score.random_slope_and_intercepts_model.woL2 <- lmer(is_will_construction ~ mean_prof_score + (1 + mean_prof_score | anon_id), data = future_tokens_data %>% filter(level_id != 2))
+
+summary(mean_prof_score.random_slope_and_intercepts_model.woL2)
+
+mean_prof_score.random_slope_and_intercepts_modelWOL2.coefs = coef(mean_prof_score.random_slope_and_intercepts_model.woL2)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+```
+
+```{r}
+anova(mean_prof_score.random_slope_and_intercepts_model.woL2)
+```
 
 
 
-### Predict 'will' with Level using Random Intercepts
+```{r, label = 'anovaIntswoLv2'}
+
+#ANOVA for Intercepts
+print('ANOVA for Intercepts by Level')
+summary(aov(Intercept ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
+  distinct()))
+```
+
+```{r, label = 'anovaSlopewoLv2'}
+print('ANOVA for Slopes by Level')
+summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
+  distinct()))
+```
+
+
+### Predict 'will' with Level using Random Intercepts and Random Slopes
 
 ```{r, label = 'randIntSloLevel'}
-level_id.intercepts_and_slope_model <- lmer(is_will_construction ~ level_id + (1 + level_id | anon_id), data = future_tokens_data %>% mutate(level_id = level_id-2))
+level_id.intercepts_and_slope_model <- lmer(is_will_construction ~ level_id + (1 + level_id | anon_id), data = future_tokens_data   %>% mutate(level_id = level_id-2))
 
 summary(level_id.intercepts_and_slope_model)
 
@@ -320,22 +364,81 @@ level_id.model_coefs %>%
 ```
 
 
-#### ANOVA of Prediction 'will' with Level Id using Random Intercepts and Random Slopes
-```{r, label = 'anovaLevelInt'}
-summary(aov(Intercept ~  level_id.y, data = 
-    level_id.model_coefs %>% 
-    left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
-    distinct()
-  ))
+
+```{r}
+anova(level_id.intercepts_and_slope_model)
 ```
 
+#### Without Level 2
 
-```{r, label = 'anovaLevelSlopes'}
-summary(aov( level_id.x ~ level_id.y, data = 
-    level_id.model_coefs %>% 
-    left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
-    distinct()
-  ))
+```{r, label = 'randIntSloLevel'}
+level_id.intercepts_and_slope_model.woLevel2 <- lmer(is_will_construction ~ level_id + (1 + level_id | anon_id), data = future_tokens_data  %>%  filter(level_id !=2) %>% mutate(level_id = level_id-2))
+
+summary(level_id.intercepts_and_slope_model.woLevel2)
+
+level_id.model_coefs.woLevel2 = coef(level_id.intercepts_and_slope_model.woLevel2)$anon_id %>% 
+  rename(Intercept = `(Intercept)`) %>% 
+  rownames_to_column("anon_id")
+```
+```{r}
+anova(level_id.intercepts_and_slope_model.woLevel2)
 ```
 
+## Longitudinal Analysis
+
+```{r, label = 'longAn'}
+#score Data
+score_data = as_tibble(read.csv(url('https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/test_scores.csv')))
+
+#Find students who took the test more than once
+n_occur <- data.frame(table(score_data$anon_id))
+multiple_ids = n_occur[n_occur$Freq > 1,]$Var1
+
+longit_score_data = score_data %>% 
+  filter(trimws(anon_id) %in% multiple_ids)
+  
+```
+
+```{r, longAnProf}
+future_tokens_data %>% 
+  inner_join(longit_score_data, by = c('anon_id','semester')) %>% 
+  distinct() %>% 
+  mutate(scale_lct = scale(LCT_Score.y)) %>% 
+  mutate(scale_mtelp = scale(MTELP_Conv_Score.y)) %>% 
+  mutate(scale_wr = scale(Writing_Sample.y)) %>% 
+  mutate(mean_prof_score = rowMeans(select(.,scale_lct, scale_mtelp, scale_wr), na.rm = T)) %>% 
+  select(anon_id, semester, is_will_construction, is_goingTo_construction, mean_prof_score) %>% 
+  group_by(anon_id, semester) %>% 
+  summarise_all(mean) %>% 
+  filter(n()>1) %>% 
+  separate(semester,c('year',NA)) %>% 
+  ggplot(aes(year, mean_prof_score, color = anon_id, group = anon_id)) +
+  geom_point() + geom_line()+
+  labs(title = 'Longitudinal Proficiency Increase', x = 'Year',y = 'Mean Proficiency Score (scaled)', color = 'Student (ID)')
+  
+  
+  
+  
+```
+
+```{r, longAnWill}
+future_tokens_data %>% 
+  inner_join(longit_score_data, by = c('anon_id','semester')) %>% 
+  distinct() %>% 
+  mutate(scale_lct = scale(LCT_Score.y)) %>% 
+  mutate(scale_mtelp = scale(MTELP_Conv_Score.y)) %>% 
+  mutate(scale_wr = scale(Writing_Sample.y)) %>% 
+  mutate(mean_prof_score = rowMeans(select(.,scale_lct, scale_mtelp, scale_wr), na.rm = T)) %>% 
+  select(anon_id, semester, is_will_construction, is_goingTo_construction, mean_prof_score) %>% 
+  group_by(anon_id, semester) %>% 
+  summarise_all(mean) %>% 
+  filter(n()>1) %>% 
+  separate(semester,c('year',NA)) %>% 
+  ggplot(aes(year, is_will_construction, color = anon_id, group = anon_id)) +
+  geom_point() + geom_line()+
+  labs(title = 'Proportion of will Construction Utilized', x = 'Year',y = 'Proportion of future tokens with will constr.', color = 'Student (ID)')
+  
+  
+
+```
 

@@ -55,12 +55,11 @@ Students who took more than one set of proficiency (3%) exams were excluded from
 
 In the corpus, 18,490 instances of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%). The vast majority (98.75%) of verbs that follow `will` are of the base form, as are (98.62%) of verbs following the `going to` construction. This suggests that the context of the sentence, as of the current part-of-speech tagging scheme, will be unlikely to hold explanatory power. There were 23 stunts in Level 2, 394 in Level 3, 709 in Level 4, and 430 in Level 3; this imbalance is addressed.
 
-A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an anlayis would also become statistically problematic if predictions of the  *proportion* of times a student would use one constuction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.  
+A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an anlayis would also become statistically problematic if predictions of the *proportion* of times a student would use one constuction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.
 
 ![Figure 1. Each Proficency Score and Percentage of `will` Construction](/images/DataAnalysis-corrAn-1.png)
 
-
-Conducting a random effects model, with random slopes and random intercepts that predicts whether a instance of future tense construction will use the `will` or `going to` variant (with `will` being a value of 1 and `going to` a value of 0), proficiency is found to be a significant (`t = 2.871`) predictor of construction preference.
+Conducting a random effects model, with random slopes and random intercepts that predicts whether a instance of future tense construction will use the `will` or `going to` variant (with `will` being a value of 1 and `going to` a value of 0), proficiency is found to be a significant (t = 2.871, F = 8.2417) predictor of construction preference.
 
 Further, Figure 2 shows that the random intercepts found by the model vary in distribution significantly (p = 0.00829), as do the slopes (p \< 0.001) found by the model, shown in Figure 4.
 
@@ -68,21 +67,29 @@ Further, Figure 2 shows that the random intercepts found by the model vary in di
 
 ![Figure 3. Boxplot of Slopes predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)
 
-Because there was steep imbalance in the number of students in level 2 the same model was run excluding these students. This model (t = 2.381) also found that slope was a significant predictor, when comparing levels 3 and higher (p = 0.002), but Intercepts were not found to vary significantly by level (p = 0.20), in the model that used proficiency to predict future tense construction.  
+Because there was steep imbalance in the number of students in level 2 the same model was run excluding these students. This model (t = 2.381, F = 5.6702) also found that slope was a significant predictor, when comparing levels 3 and higher (p = 0.002), but Intercepts were not found to vary significantly by level (p = 0.20), in the model that used proficiency to predict future tense construction.
 
-A similar analysis was conducted on the effects of the level of the students. The level of the course the student was in was also found to be a significant (t = 2.791) predictor of preference for construction. The resulting Intercepts and slopes are shown in Figure 4 and Figure 5 respectively. This finding is futher supported by a significant difference in Intercepts by level (p < 0.001) and a significant difference in Slopes by level (p = 0.004). When Level 2 students were removed from the model, the results hold (t = 2.339), with Intercepts having p = 0.011, and Slopes having p = 0.047, when group by Level 3 and up. 
+A similar analysis was conducted on the effects of the level of the students. The course level the student was in was also found to be a significant (t = 2.791, F = 7.791) predictor of preference for construction. The resulting Intercepts and slopes are shown in Figure 4 and Figure 5, respectively. When Level 2 students were removed from the model, the results hold (t = 2.339, F = 5.4712), that Level is a significant predictor
 
 ![Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplot-1.png)
 
 ![Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png)
 
-
-
 ## Discussion
+
+The models suggest a meaningful difference in what construction will be used based on the proficiency metric utilized (the mean of three independent tests.) With an increase in the intercepts, which can be interpreted as the base probability that the `will` construction will be used, it seems that the `will` construction will increase over time. Furthermore, because the model utilized random slopes, the level at which the students were associated with the proficiency exam seems to influence their rate of increase in the wall construction. However, after the pre-intermediate, there does not seem to be significant variation in *Intercepts* that can be attributed to Level. This suggests a learning period for students to use either construction. The slope, which captures the effect of proficiency, still varies significantly by level.
+
+Naturally, students' proficiency will correspond to their placement in a course level. This is confirmed by a second set of models, indicating that Level is a significant predictor of the `will` construction use. This suggests that the level of instruction plays a major role in the construction the students will utilize.
 
 ## Conclusion
 
+This project is a corpus-based investigation of the role of English learners' proficiency in selecting between the `will` construction and `going to` construction when formulating the future tense. These results suggest that there is indeed a significant effect of both proficiency and course level on not only if the students utilize one of the constructions but the rate and default probability varies by level. These results have implications for curricula designed to teach English, as they show that utilizing the `will` construction correlates with higher proficiency scores.
+
+Future directions for this research naturally include extending the scope of the analysis to include lexical future construction (Bardovi-Harlig, 2005). This includes other ways of indicating that an event will occur in the future (such as `want`). This offers more options to learners, which may be selected for. Note that this data was collected from an academic context, so further studies would include spoken and more casual speech. Investigations as to the level at which students are taught the future tense could hold important explanatory power. This would be a curriculum analysis approach. Finally, the prompt that was given to the students for them to respond to may affect the call for using the future tense. While this investigation seeks to minimize the effects by investigating individual tokens, an in-depth, review of the questions asked would be an important research question.
+
 ### Debrief
+
+This project was part of LING2020 - Data Science for Research in Linguistics, at the University of Pittsburgh. The research could be described as incremental. Pulling in the data and working it mostly into a helpful format was straightforward. However, there was a significant issue when pulling in the tokenized, lemmatized, and part-of-speech tagged data. Because this was saved just as a string, there was no structure, which made interpretation difficult. Once the data was massaged into something useful, the main difficulty was investing all the different possible correlations that could exist. Starting with proficiency, many models were tested and run, about five times what is actually reported (see the scratchpad for just some of these.) Further, utilizing the correct statistical tools to answer the questions was a major learning experience, and I familiarized myself with a new set of analytic tools.
 
 ## References
 

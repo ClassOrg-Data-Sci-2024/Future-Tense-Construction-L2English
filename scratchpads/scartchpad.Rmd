@@ -223,10 +223,41 @@ create_corr_diagram(
 ```
 
 
+#### ANOVA of Prediction 'will' with Level Id using Random Intercepts and Random Slopes
+```{r, label = 'anovaLevelInt'}
+summary(aov(Intercept ~  level_id.y, data = 
+    level_id.model_coefs %>% 
+    left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+    distinct()
+  ))
+```
 
 
+```{r, label = 'anovaLevelSlopes'}
+summary(aov( level_id.x ~ level_id.y, data = 
+    level_id.model_coefs %>% 
+    left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+    distinct()
+  ))
+```
 
 
+```{r, label = 'anovaLevelIntwoLv2'}
+summary(aov(Intercept ~  level_id.y, data = 
+    level_id.model_coefs.woLevel2 %>% 
+    left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+    distinct()
+  ))
+```
+
+
+```{r, label = 'anovaLevelSlopeswoLV2'}
+summary(aov( level_id.x ~ level_id.y, data = 
+    level_id.model_coefs.woLevel2 %>% 
+    left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+    distinct()
+  ))
+```
 
 
 
