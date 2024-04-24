@@ -1,7 +1,7 @@
 ---
 title: "FutureTenseConstructionL2English-DataProcessing"
 author: "Daniel Crawford"
-date: "04/02/2024"
+date: "04/24/2024"
 output: 
   github_document: 
     toc: TRUE
@@ -35,7 +35,6 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
 
 nrow(PELIC_compiled)
 ncol(PELIC_compiled)
-head(PELIC_compiled)
 ```
 
 The data contains about 46,000 entries, and a vast about of background data on the students. Of note will be L1, level, and scores on proficiency measures. 
@@ -48,7 +47,6 @@ The data contains about 46,000 entries, and a vast about of background data on t
 student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
 nrow(student_info)
 ncol(student_info)
-head(student_info)
   
 ```
 
@@ -220,7 +218,7 @@ filtered_tokenized_data %>% write.csv(paste0(dirname(getwd()),'/Data Files/filte
 
 ```{r, label = 'countShall'}
 tokenized_df_unnested %>% 
-  filter(trimws(lemma) == 'shall')
+  filter(trimws(lemma) == 'shall') %>% nrow()
 ```
 
 
