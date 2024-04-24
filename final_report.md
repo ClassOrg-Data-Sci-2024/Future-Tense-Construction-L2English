@@ -53,17 +53,17 @@ Students who took more than one set of proficiency (3%) exams were excluded from
 
 ## Results
 
-In the corpus, 18,490 instances of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%). The vast majority (98.75%) of verbs that follow `will` are of the base form, as are (98.62%) of verbs following the `going to` construction. This suggests that the context of the sentence, as of the current part-of-speech tagging scheme, will be unlikely to hold explanatory power. There were 23 stunts in Level 2, 394 in Level 3, 709 in Level 4, and 430 in Level 3; this imbalance is addressed.
+In the corpus, [18,490 instances](https://github.com/ClassOrg-Data-Sci-2024/Future-Tense-Construction-L2English/blob/main/Data%20Analysis/DataAnalysis.md#summary-statistics) of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%). The vast majority (98.75%) of verbs that follow `will` are of the base form, as are (98.62%) of verbs following the `going to` construction. This suggests that the context of the sentence, as of the current part-of-speech tagging scheme, will be unlikely to hold explanatory power. There were 23 students in Level 2, 394 in Level 3, 709 in Level 4, and 430 in Level 3; this imbalance is addressed.
 
-A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an analysis would also become statistically problematic if predictions of the *proportion* of times a student would use one construction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.
+A correlation across groups of students was not deemed prudent. There appeared to be no qualitative correlation found, with any of the proficiency scores. Such an analysis would also become statistically problematic if predictions of the *proportion* of times a student would use one construction or the other suggested values outside the range of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.
 
 ![Figure 1. Each Proficency Score and Percentage of will Construction](/images/DataAnalysis-corrAn-1.png) 
 
 Figure 1. Each Proficiency Score and Percentage of `will` Construction
 
-Conducting a random effects model, with random slopes and random intercepts that predicts whether a instance of future tense construction will use the `will` or `going to` variant (with `will` being a value of 1 and `going to` a value of 0), proficiency is found to be a significant (t = 2.871, F = 8.2417) predictor of construction preference.
+Conducting a random effects model, with random slopes and random intercepts that predicts whether a instance of future tense construction will use the `will` or `going to` variant (with `will` being a value of 1 and `going to` a value of 0), [proficiency is found to be a significant](https://github.com/ClassOrg-Data-Sci-2024/Future-Tense-Construction-L2English/blob/main/Data%20Analysis/DataAnalysis.md#predict-will-with-mean-of-prof-scores-using-random-intercepts-and-random-slopes) (t = 2.871, F = 8.2417) predictor of construction preference.
 
-Further, Figure 2 shows that the random intercepts found by the model vary in distribution significantly (p = 0.00829), as do the slopes (p \< 0.001) found by the model, shown in Figure 4.
+Further, Figure 2 shows that the random intercepts found by the model [vary significantly](https://github.com/ClassOrg-Data-Sci-2024/Future-Tense-Construction-L2English/blob/main/Data%20Analysis/DataAnalysis.md#anovas-for-random-intercepts-and-random-slopes-by-level) (p = 0.00829), by the level of the students, as do the slopes (p \< 0.001) found by the model, shown in Figure 4.
 
 ![Figure 2. Boxplot of Intercepts predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png) 
 

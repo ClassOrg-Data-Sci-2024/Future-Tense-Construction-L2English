@@ -107,30 +107,7 @@ construction_counts %>%
 construction_props = construction_counts %>% 
   mutate(prop_goingTo_construction = count_goingTo_construction/(count_will_construction+count_goingTo_construction), .after = anon_id) %>% 
   mutate(prop_will_construction = count_will_construction/(count_will_construction+count_goingTo_construction), .after = anon_id)
-
-construction_props
 ```
-
-    ## # A tibble: 1,078 × 35
-    ##        X anon_id prop_will_construction prop_goingTo_construction
-    ##    <int> <chr>                    <dbl>                     <dbl>
-    ##  1     1 aa0                     1                         0     
-    ##  2     2 aa1                     1                         0     
-    ##  3     3 aa2                     0.913                     0.0870
-    ##  4     4 aa3                     0.75                      0.25  
-    ##  5     5 aa5                     1                         0     
-    ##  6     6 aa8                     0.0833                    0.917 
-    ##  7     7 aa9                     0.833                     0.167 
-    ##  8     8 ab2                     1                         0     
-    ##  9     9 ab6                     1                         0     
-    ## 10    10 ab8                     1                         0     
-    ## # ℹ 1,068 more rows
-    ## # ℹ 31 more variables: count_will_construction <int>,
-    ## #   count_goingTo_construction <int>, gender <chr>, birth_year <int>,
-    ## #   native_language <chr>, language_used_at_home <chr>,
-    ## #   non_native_language_1 <chr>, yrs_of_study_lang1 <chr>,
-    ## #   study_in_classroom_lang1 <chr>, ways_of_study_lang1 <chr>,
-    ## #   non_native_language_2 <chr>, yrs_of_study_lang2 <chr>, …
 
 ## Distributions of Scores
 
@@ -176,27 +153,7 @@ construction_props %>%
 scaled_construction_props = construction_props %>% 
   select(anon_id, prop_will_construction, prop_goingTo_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
   mutate(across(-c(anon_id,prop_will_construction, prop_goingTo_construction), ~ scale(.x))) 
-  
-  
-scaled_construction_props
 ```
-
-    ## # A tibble: 1,078 × 9
-    ##    anon_id prop_will_construction prop_goingTo_construction LCT_Score[,1]
-    ##    <chr>                    <dbl>                     <dbl>         <dbl>
-    ##  1 aa0                     1                         0              1.51 
-    ##  2 aa1                     1                         0             -1.10 
-    ##  3 aa2                     0.913                     0.0870        -0.613
-    ##  4 aa3                     0.75                      0.25           1.51 
-    ##  5 aa5                     1                         0             -0.940
-    ##  6 aa8                     0.0833                    0.917          0.855
-    ##  7 aa9                     0.833                     0.167         -2.08 
-    ##  8 ab2                     1                         0             -0.613
-    ##  9 ab6                     1                         0              0.529
-    ## 10 ab8                     1                         0             -0.940
-    ## # ℹ 1,068 more rows
-    ## # ℹ 5 more variables: MTELP_I <dbl[,1]>, MTELP_II <dbl[,1]>,
-    ## #   MTELP_III <dbl[,1]>, MTELP_Conv_Score <dbl[,1]>, Writing_Sample <dbl[,1]>
 
 ``` r
 #Get Scaled values, but only for students who used future tense at least 30 times. 
@@ -207,27 +164,7 @@ scaled_construction_props_30plus = construction_counts %>%
   mutate(prop_will_construction = count_will_construction/(count_will_construction+count_goingTo_construction), .after = anon_id) %>% 
   select(anon_id, prop_will_construction, prop_goingTo_construction, LCT_Score, MTELP_I, MTELP_II, MTELP_III, MTELP_Conv_Score, Writing_Sample) %>% 
   mutate(across(-c(anon_id,prop_will_construction, prop_goingTo_construction), ~ scale(.x)))
-  
-
-scaled_construction_props_30plus
 ```
-
-    ## # A tibble: 187 × 9
-    ##    anon_id prop_will_construction prop_goingTo_construction LCT_Score[,1]
-    ##    <chr>                    <dbl>                     <dbl>         <dbl>
-    ##  1 aa1                      1                        0             -0.821
-    ##  2 ad8                      0.830                    0.170          1.24 
-    ##  3 ae3                      0.875                    0.125         -0.684
-    ##  4 ae9                      1                        0              1.51 
-    ##  5 af0                      0.885                    0.115         -0.136
-    ##  6 ag9                      0.745                    0.255          0.413
-    ##  7 ah1                      0.703                    0.297          0.413
-    ##  8 ai1                      0.971                    0.0288         0.276
-    ##  9 ai3                      0.706                    0.294         -1.51 
-    ## 10 aj9                      0.95                     0.05           0.824
-    ## # ℹ 177 more rows
-    ## # ℹ 5 more variables: MTELP_I <dbl[,1]>, MTELP_II <dbl[,1]>,
-    ## #   MTELP_III <dbl[,1]>, MTELP_Conv_Score <dbl[,1]>, Writing_Sample <dbl[,1]>
 
 # Correlation Analysis
 
@@ -411,12 +348,6 @@ anova(mean_prof_score.random_slope_and_intercepts_model)
 
 ``` r
 #ANOVA for Intercepts
-print('ANOVA for Intercepts by Level')
-```
-
-    ## [1] "ANOVA for Intercepts by Level"
-
-``` r
 summary(aov(Intercept ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
   distinct()))
@@ -429,12 +360,7 @@ summary(aov(Intercept ~ level_id, data = mean_prof_score.random_slope_and_interc
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 ``` r
-print('ANOVA for Slopes by Level')
-```
-
-    ## [1] "ANOVA for Slopes by Level"
-
-``` r
+#ANOVA for Slopes
 summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
   distinct()))
@@ -496,13 +422,7 @@ anova(mean_prof_score.random_slope_and_intercepts_model.woL2)
     ## mean_prof_score    1 0.40808 0.40808  5.6702
 
 ``` r
-#ANOVA for Intercepts
-print('ANOVA for Intercepts by Level')
-```
-
-    ## [1] "ANOVA for Intercepts by Level"
-
-``` r
+#ANOVA for Intercepts without Level 2
 summary(aov(Intercept ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
   distinct()))
@@ -515,12 +435,7 @@ summary(aov(Intercept ~ level_id, data = mean_prof_score.random_slope_and_interc
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 ``` r
-print('ANOVA for Slopes by Level')
-```
-
-    ## [1] "ANOVA for Slopes by Level"
-
-``` r
+#ANOVA for Slopes without Level 2
 summary(aov(mean_prof_score ~ level_id, data = mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
   distinct()))
