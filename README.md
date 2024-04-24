@@ -32,4 +32,5 @@ Juffs, A., Han, N-R., & Naismith, B. (2020). The University of Pittsburgh Englis
 -   [project_plan.md](/project_plan.md): Original Project plan, with some background information.
 -   [README.md](/README.md): This file, for orientation and direction
 -   [LICENSE.md](/LICENSE.md): Creative Commons License (inherited form [PELIC's Liscense](https://github.com/ELI-Data-Mining-Group/PELIC-dataset?tab=readme-ov-file#11-license))
+-   [Future Tense Construction Preference in L2 English Learners.pdf](/Future Tense Construction Preference in L2 English Learners.pdf) - Accompanying Presentation (many updates have been made)
 -   [.gitignore](/.gitignore): Standard R .gitgnore with addition of `large_data/*` (See Below)
