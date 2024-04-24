@@ -216,6 +216,10 @@ filtered_tokenized_data %>% write.csv(paste0(dirname(getwd()),'/Data Files/filte
 ```
 
 
+```{r, label = 'countShall'}
+tokenized_df_unnested %>% 
+  filter(trimws(lemma) == 'shall')
+```
 
 
 

@@ -8,7 +8,7 @@ Final Report - Future Tense Construction Preference in L2 English Learners.pdf
 
 ## Introduction
 
-The construction of the future tense in English is a curious topic. Indeed, there have been calls for re-analyzing English future tense (Huddleston 1995). Regardless, expressing occurrences that will happen in the future remains integral to a speaker's linguistic capability. To this end, when teaching English as a Second Language, it is essential to construct a curriculum that will allow for the future tense to be expressed by those learning English. This project is a corpus-based analysis of the effects of the speaker's proficiency on their preference for how the future tense is constructed.
+The construction of the future tense in English is a curious topic. Indeed, there have been calls for re-analyzing English future tense (Huddleston, 1995). Regardless, expressing occurrences that will happen in the future remains integral to a speaker's linguistic capability. To this end, when teaching English as a Second Language, it is essential to construct a curriculum that will allow for the future tense to be expressed by those learning English. This project is a corpus-based analysis of the effects of the speaker's proficiency on their preference for how the future tense is constructed.
 
 ## Background
 
@@ -26,7 +26,7 @@ Note that these constructions directly indicate that the verb will take place in
 
 ### Data
 
-The data utilized to suggest an answer to this question comes from the University of Pittsburgh English Language Institute Corpus (PELIC). This corpus is a collection of written responses from 1177 students enrolled in the University of Pittsburgh's Intensive English Program from 2005 to 2012 in an English for Academic Purposes Context. The data comprises 46,230 texts and 4,250,703 tokens. Each text has been tokenized and lemmatized, according to the Penn Tree Bank (Marcus, 1999). This was done with Python's NLTK library, as was Part-of-Speech tagging, utilizing the Penn Treebank POS tagset.
+The data utilized to suggest an answer to this question comes from the [University of Pittsburgh English Language Institute Corpus (PELIC)](https://eli-data-mining-group.github.io/Pitt-ELI-Corpus/) ([GitHub Repo](https://github.com/ELI-Data-Mining-Group/PELIC-dataset)). This corpus is a collection of written responses from 1177 students enrolled in the University of Pittsburgh's Intensive English Program from 2005 to 2012 in an English for Academic Purposes Context. The data comprises 46,230 texts and 4,250,703 tokens. Each text has been tokenized and lemmatized, according to the Penn Tree Bank (Marcus, 1999). This was done with Python's NLTK library, as was Part-of-Speech tagging, utilizing the [Penn Treebank POS tagset](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html).
 
 ### Methods
 
@@ -36,7 +36,7 @@ Proficiency was measured as the mean of the following scores z-scored normalized
 
 -   `LCT_Score`: an ELI (English Language Institute) listening test
 -   `Writing_Sample`: an ELI (English Language Institute) writing test
--   `MTELP_Conv_Score`: combined score from the Michigan Test of English Language Proficiency.
+-   `MTELP_Conv_Score`: combined score from the [Michigan Test of English Language Proficiency](https://michiganassessment.org/michigan-tests/met-new/).
 
 (Raw scores were provided in the data set.) Proficiency was also operationalized by the course level, the student was in:
 
@@ -47,9 +47,9 @@ Proficiency was measured as the mean of the following scores z-scored normalized
 
 For the models used, the number of the course will be treated as a real number value, minus 2: 2 \> 0, 3 \> 1, etc. This allows for a mixed effects model to be used, and then the coefficient of the level can be thought of as corresponding changes due to one increase in level. s
 
-Each occurrence of a `will` or `going to` construction was treated as an individual observation. Then, considering each student as a 'group' whose members are the tokens of future construction, a mixed effects model was fit. This method selection is in accordance with research on language variation and change, which suggests that meaningful insights are contained in random intercepts of random effects models (Drager & Hay 2012).
+The tokens were found by searching for `will` and a modal (`MD` tag) and a `going` token followed by a `to` token, followed withing two tokens by a verb (to allow for modifiers.) Note that there are only 28 occurrences of `shall` in the entire corpus, and following previous research (Bardovi-Harlig, 2005), was not included in the analysis. Each occurrence of a `will` or `going to` construction was treated as an individual observation. Then, considering each student as a 'group' whose members are the tokens of future construction, a mixed effects model was fit. This method selection is in accordance with research on language variation and change, which suggests that meaningful insights are contained in random intercepts of random effects models (Drager & Hay 2012).
 
-Students who took more than one set of proficiency (3%) exams were excluded from the main analysis, and had a seperate longitudinal analysis conducted on their data points.
+Students who took more than one set of proficiency (3%) exams were excluded from the main analysis, and had a separate longitudinal analysis conducted on their data points.
 
 ## Results
 
@@ -93,7 +93,7 @@ A qualitative longitudinal analysis was performed with only a few students with 
 
 Figure 6. Students Longitudinal Proficiency
 
-![Figure 7. Student Longitudinal Preference for 'will' Construction](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png) 
+![Figure 7. Student Longitudinal Preference for 'will' Construction](/images/DataAnalysis-longAnWill-1.png) 
 
 Figure 7. Student Longitudinal Preference for 'will' Construction
 
@@ -117,12 +117,12 @@ This project was part of LING2020 - Data Science for Research in Linguistics, at
 
 ## References
 
-Bardovi-Harlig, K. (2005). Proceedings of the 7th Generative Approaches to Second Language Acquisition Conference (GASLA 2004), ed. Laurent Dekydtspotter et al., 1-12. Somerville, MA: Cascadilla Proceedings Project.
+Bardovi-Harlig, K. (2005). Proceedings of the 7th Generative Approaches to Second Language Acquisition Conference (GASLA 2004), ed. Laurent Dekydtspotter et al., 1-12. Somerville, MA: Cascadilla Proceedings Project.[LINK](https://www.lingref.com/cpp/gasla/7/paper1151.pdf)
 
-Berglund, Y. (2005). Expressions of Future in Present-day English: A Corpus-based Approach (PhD dissertation, Acta Universitatis Upsaliensis). Retrieved from <https://urn.kb.se/resolve?urn=urn:nbn:se:uu:diva-5794>
+Berglund, Y. (2005). Expressions of Future in Present-day English: A Corpus-based Approach (PhD dissertation, Acta Universitatis Upsaliensis). Retrieved from <https://urn.kb.se/resolve?urn=urn:nbn:se:uu:diva-5794> [LINK](https://www.diva-portal.org/smash/record.jsf?pid=diva2%3A166402&dswid=-3769)
 
-Drager, K & Hay, J. (2012). Exploiting random intercepts: Two case studies in sociophonetics. Language Variation and Change. 24. 10.1017/S0954394512000014.
+Drager, K & Hay, J. (2012). Exploiting random intercepts: Two case studies in sociophonetics. Language Variation and Change. 24. 10.1017/S0954394512000014. [LINK](https://www.researchgate.net/publication/259420420_Exploiting_random_intercepts_Two_case_studies_in_sociophonetics)
 
-Huddleston, R. (1995). The case against a future tense in English. Studies in Language 19 (2) 399-446. <https://doi.org/10.1075/sl.19.2.04hud>
+Huddleston, R. (1995). The case against a future tense in English. Studies in Language 19 (2) 399-446. <https://doi.org/10.1075/sl.19.2.04hud> [LINK](https://www.jbe-platform.com/content/journals/10.1075/sl.19.2.04hud)
 
-Marcus, M P., et al. (1999). Treebank-3 LDC99T42. Web Download. Philadelphia: Linguistic Data Consortium
+Marcus, M P., et al. (1999). Treebank-3 LDC99T42. Web Download. Philadelphia: Linguistic Data Consortium [LINK](https://catalog.ldc.upenn.edu/LDC99T42)
