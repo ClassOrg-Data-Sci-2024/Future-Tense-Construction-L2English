@@ -1,16 +1,19 @@
 ---
-title: "FutureTenseConstructionL2English"
+title: "FutureTenseConstructionL2English-DataProcessing"
 author: "Daniel Crawford"
 date: "04/02/2024"
 output: 
   github_document: 
     toc: TRUE
 ---
-EXISTING
+
 
 # Correlation of Future Tense Construction Preference with Proficiency Scores for English L2 Learners
+```{r, setup}
+knitr::opts_chunk$set(fig.path = paste0(dirname(getwd()),'/images/DataAnalysis-'))
+```
 
-```{r}
+```{r, label = 'import'}
 #Import Packages
 library(tidyverse)
 ```
@@ -19,7 +22,7 @@ library(tidyverse)
 Raw data can be found [here](https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/PELIC_compiled.csv).
 
 ### Read in Data from PELIC
-```{r}
+```{r, label = 'readPelic'}
 #Read in Data from PELIC: 
 
 if (file.exists(paste0(dirname(getwd()),'/large_data/pelic_compiled.csv'))){
@@ -39,7 +42,7 @@ The data contains about 46,000 entries, and a vast about of background data on t
 
 
 ### Read in Student Indo
-```{r}
+```{r, label = 'readStudentInfo'}
 #Need to get demographic and proficiency scores for each student
 
 student_info = as_tibble(read.csv(url("https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/student_information.csv")))
@@ -55,7 +58,7 @@ The student information for the 1,313 students expands on the demographics, and 
 ## Tokenize Data
 
 ### Tokenize Lemmatized Data Helper Function
-```{r}
+```{r, label = 'tokFunc'}
 #A function to create a tokenized df with columns: token | lemma | POS
 #Input is a string
 tlp_text_to_df = function(x){
@@ -81,7 +84,7 @@ tlp_text_to_df = function(x){
 ```
 
 
-```{r}
+```{r, label = 'readTokUnnested'}
 if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))){
   print('Reading in File from directory')
   tokenized_df_unnested = read.csv(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv'))
@@ -107,14 +110,14 @@ if (file.exists(paste0(dirname(getwd()),'/large_data/tokenized_df_unnested.csv')
 ## Summary of Data 
 
 ### Summary of 'will' tokens
-```{r}
+```{r, label = 'countWill'}
 tokenized_df_unnested %>% 
   filter(trimws(lemma) == "will" & trimws(token) != 'will' ) %>% 
   count(token, lemma)
 ```
 
 ### Summary of 'going' tokens
-```{r}
+```{r, label = 'summaryGoing'}
 tokenized_df_unnested %>% 
   filter(trimws(lemma) == "go" & trimws(token) != 'going' ) %>% 
   count(token)
@@ -122,7 +125,7 @@ tokenized_df_unnested %>%
 Note that not all of these are of the 'going to' future construction
 
 ## Format the Data 
-```{r}
+```{r, label = 'formatData'}
 
 #Create counts_data, each row is a token
 counts_data =  tokenized_df_unnested %>% 
@@ -166,7 +169,7 @@ countruction_counts_and_student_info  = PELIC_compiled %>%
 
 ### Bring in score data
 
-```{r}
+```{r, label = 'joinScores'}
 #score Data
 score_data = as_tibble(read.csv(url('https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/test_scores.csv')))
 
@@ -186,7 +189,7 @@ countruction_counts_and_student_info_with_scores = countruction_counts_and_stude
 
 ### Save The data
 
-```{r}
+```{r, label = 'saveConstrCounts'}
 countruction_counts_and_student_info_with_scores %>% 
   write.csv(paste0(dirname(getwd()),'/Data Files/FINAL_DATA_countruction_counts_and_student_info_with_scores.csv'))
 ```
@@ -195,7 +198,7 @@ countruction_counts_and_student_info_with_scores %>%
 My strategy for importing the data is to find construction in question in the text, and then to join in the student demographic information
 
 
-```{r}
+```{r, label = 'saveTokenizedData'}
 #In order to perform analysis on tokens later
 filtered_tokenized_data = tokenized_df_unnested %>% 
   #if there is a 'will' token that is a modal, put 1 in new column, else 0
