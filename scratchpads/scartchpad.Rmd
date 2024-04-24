@@ -260,6 +260,35 @@ summary(aov( level_id.x ~ level_id.y, data =
 ```
 
 
+```{r, label = 'randIntAndSlopesByLevel'}
+mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
+  distinct() %>%
+  ggplot()+
+  geom_point(aes(Intercept, mean_prof_score, color = level_id))+
+  facet_wrap(~level_id)+
+  labs(title = 'Intercept and Coefficient of Mean Proficency Score by Level')
+```
+
+
+
+```{r, label = 'randIntSloLevelBoxplot'}
+level_id.model_coefs %>% 
+  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+  ggplot()+
+  geom_boxplot(aes(x = factor(level_id.y), y = Intercept)) + 
+  labs(x = "ELI Level", y = "Random Speaker Intercept", title = "Effects of ELI Level on Speaker Intercept")
+```
+
+```{r, label = 'randIntSloLevelBoxplotSlope'}
+level_id.model_coefs %>% 
+  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
+  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
+  ggplot()+
+  geom_boxplot(aes(x = factor(level_id.y), y = level_id.x)) + 
+  labs(x = "ELI Level", y = "Random Speaker Slope", title = "Effects of ELI Level on Speaker Slope")
+```
 
 
 

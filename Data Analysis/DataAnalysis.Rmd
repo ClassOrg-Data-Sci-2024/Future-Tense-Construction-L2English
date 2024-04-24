@@ -83,7 +83,7 @@ construction_props %>%
   labs(title = "Proficiency Score Distributions", x = "Value (Raw)", y = "Frequency") +
   theme_minimal()
 ```
-
+![Correlation Image](../images/DataAnalysis-distScores-1.png)
 
 
 ```{r, label = 'distWritingScores'}
@@ -97,7 +97,7 @@ construction_props %>%
   labs(title = "Proficiency Score Distributions", x = "Value (Raw)", y = "Frequency") +
   theme_minimal()
 ```
-
+![Correlation Image](../images/DataAnalysis-distWritingScores-1.png)
 
 
 
@@ -138,7 +138,7 @@ scaled_construction_props_30plus %>%
   facet_wrap(~name)+
   labs(title = "Proficiency Score Distributions (more than 30 uses of future tense)", x = "Proportion of 'will' construction", y = "Proficinecy Test Score")
 ```
-
+![Correlation Image](../images/DataAnalysis-corrAn-1.png)
 
 
 
@@ -224,15 +224,10 @@ mean_prof_score.random_slope_and_intercepts_model.coefs = coef(mean_prof_score.r
   rownames_to_column("anon_id")
 ```
 
-```{r, label = 'randIntAndSlopesByLevel'}
-mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
-  distinct() %>%
-  ggplot()+
-  geom_point(aes(Intercept, mean_prof_score, color = level_id))+
-  facet_wrap(~level_id)+
-  labs(title = 'Intercept and Coefficient of Mean Proficency Score by Level')
-```
+
+
+
+
 ```{r, label = 'randIntRandSlopeLevelBoxplotOfInts'}
 mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
@@ -241,6 +236,9 @@ mean_prof_score.random_slope_and_intercepts_model.coefs %>%
   geom_boxplot()+
   labs(x = 'Level', title = 'Intercepts by Level ID')
 ```
+![Boxplots of Intercept by Level](../images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png)
+
+
 ```{r, label = 'randIntRandSlopeLevelBoxplotOfSlopes'}
 mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
@@ -249,6 +247,9 @@ mean_prof_score.random_slope_and_intercepts_model.coefs %>%
   geom_boxplot()+
   labs(x = 'Level', title = 'Slopes by Level ID', y = 'Slope')
 ```
+![Boxplots of Intercept by Level](../images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)
+
+
 ```{r, label = 'countInLevel'}
 mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
@@ -325,25 +326,6 @@ level_id.model_coefs = coef(level_id.intercepts_and_slope_model)$anon_id %>%
 ```
 
 
-```{r, label = 'randIntSloLevelBoxplot'}
-level_id.model_coefs %>% 
-  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
-  ggplot()+
-  geom_boxplot(aes(x = factor(level_id.y), y = Intercept)) + 
-  labs(x = "ELI Level", y = "Random Speaker Intercept", title = "Effects of ELI Level on Speaker Intercept")
-```
-
-```{r, label = 'randIntSloLevelBoxplotSlope'}
-level_id.model_coefs %>% 
-  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
-  ggplot()+
-  geom_boxplot(aes(x = factor(level_id.y), y = level_id.x)) + 
-  labs(x = "ELI Level", y = "Random Speaker Slope", title = "Effects of ELI Level on Speaker Slope")
-```
-
-
 
 ```{r}
 anova(level_id.intercepts_and_slope_model)
@@ -398,6 +380,8 @@ future_tokens_data %>%
   labs(title = 'Longitudinal Proficiency Increase', x = 'Year',y = 'Mean Proficiency Score (scaled)', color = 'Student (ID)')
   
 ```
+![Correlation Image](../images/DataAnalysis-longAnProf-1.png)
+
 
 ```{r, label = 'longAnWill'}
 future_tokens_data %>% 
@@ -419,4 +403,4 @@ future_tokens_data %>%
   
 
 ```
-
+![Correlation Image](../images/DataAnalysis-longAnWill-1.png)

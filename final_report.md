@@ -75,27 +75,20 @@ Figure 3. Boxplot of Slopes predicted By Proficiency grouped by Level - Random I
 
 Because there was steep imbalance in the number of students in Level 2 the same model was run excluding these students. This [model](https://github.com/ClassOrg-Data-Sci-2024/Future-Tense-Construction-L2English/blob/main/Data%20Analysis/DataAnalysis.md#without-level-2) (t = 2.381, F = 5.6702) also found that slope was a significant predictor, when comparing Levels 3 and higher (p = 0.002), but intercepts were not found to vary significantly by level (p = 0.20), in the model that used proficiency to predict future tense construction.
 
-A similar analysis was conducted on the effects of the level of the students. The course level the student was in was also found to be a significant (t = 2.791, F = 7.791) predictor of preference for construction. The resulting Intercepts and slopes are shown in Figure 4 and Figure 5, respectively. When Level 2 students were removed from the model, the results hold (t = 2.339, F = 5.4712), that level is a significant predictor
+A similar analysis was conducted on the effects of the level of the students. The course level the student was in was also found to be a significant (t = 2.791, F = 7.791) predictor of preference for construction. When Level 2 students were removed from the model, the results hold (t = 2.339, F = 5.4712), that level is a significant predictor
 
-![Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplot-1.png) 
-
-Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model
-
-![Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png) 
-
-Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model
 
 #### Longitudinal Analysis
 
-A qualitative longitudinal analysis was performed with the few students with scores provided for multiple semesters. Figure 6 indicates a generally positive trend in students' proficiency scores. This is intuitive, as proficiency naturally increases with time of study. However, there does not seem to be a clear trend of student decreasing the use of the `will` construction, with four of the seven students actually utilizing `going to` more in later semesters.
+A qualitative longitudinal analysis was performed with the few students with scores provided for multiple semesters. Figure 4 indicates a generally positive trend in students' proficiency scores. This is intuitive, as proficiency naturally increases with time of study. However, there does not seem to be a clear trend of student decreasing the use of the `will` construction, with four of the seven students actually utilizing `going to` more in later semesters, shown in Figure 5.
 
-![Figure 6. Students Longitudinal Proficiency](/images/DataAnalysis-longAnProf-1.png) 
+![Figure 4. Students Longitudinal Proficiency](/images/DataAnalysis-longAnProf-1.png) 
 
-Figure 6. Students Longitudinal Proficiency
+Figure 4. Students Longitudinal Proficiency
 
-![Figure 7. Student Longitudinal Preference for 'will' Construction](/images/DataAnalysis-longAnWill-1.png) 
+![Figure 5. Student Longitudinal Preference for 'will' Construction](/images/DataAnalysis-longAnWill-1.png) 
 
-Figure 7. Student Longitudinal Preference for 'will' Construction
+Figure 5. Student Longitudinal Preference for 'will' Construction
 
 ## Discussion
 

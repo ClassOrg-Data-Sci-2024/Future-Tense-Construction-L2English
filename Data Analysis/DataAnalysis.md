@@ -128,6 +128,7 @@ construction_props %>%
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-distScores-1.png)<!-- -->
+![Correlation Image](../images/DataAnalysis-distScores-1.png)
 
 ``` r
 construction_props %>% 
@@ -144,6 +145,7 @@ construction_props %>%
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-distWritingScores-1.png)<!-- -->
+![Correlation Image](../images/DataAnalysis-distWritingScores-1.png)
 
 ## Scale Proficiency Scores
 
@@ -179,6 +181,7 @@ scaled_construction_props_30plus %>%
 ```
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-corrAn-1.png)<!-- -->
+![Correlation Image](../images/DataAnalysis-corrAn-1.png)
 
 # Random Intercepts Analysis
 
@@ -292,18 +295,6 @@ mean_prof_score.random_slope_and_intercepts_model.coefs = coef(mean_prof_score.r
 
 ``` r
 mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id, native_language) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>%
-  distinct() %>%
-  ggplot()+
-  geom_point(aes(Intercept, mean_prof_score, color = level_id))+
-  facet_wrap(~level_id)+
-  labs(title = 'Intercept and Coefficient of Mean Proficency Score by Level')
-```
-
-![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-randIntAndSlopesByLevel-1.png)<!-- -->
-
-``` r
-mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
   left_join(future_tokens_data %>% select(anon_id, level_id) %>% mutate(level_id = factor(level_id)), by = 'anon_id') %>% 
   distinct() %>% 
   ggplot(aes(level_id, Intercept))+
@@ -312,6 +303,8 @@ mean_prof_score.random_slope_and_intercepts_model.coefs %>%
 ```
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png)<!-- -->
+![Boxplots of Intercept by
+Level](../images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png)
 
 ``` r
 mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
@@ -323,6 +316,8 @@ mean_prof_score.random_slope_and_intercepts_model.coefs %>%
 ```
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)<!-- -->
+![Boxplots of Intercept by
+Level](../images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)
 
 ``` r
 mean_prof_score.random_slope_and_intercepts_model.coefs %>% 
@@ -488,28 +483,6 @@ level_id.model_coefs = coef(level_id.intercepts_and_slope_model)$anon_id %>%
 ```
 
 ``` r
-level_id.model_coefs %>% 
-  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
-  ggplot()+
-  geom_boxplot(aes(x = factor(level_id.y), y = Intercept)) + 
-  labs(x = "ELI Level", y = "Random Speaker Intercept", title = "Effects of ELI Level on Speaker Intercept")
-```
-
-![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-randIntSloLevelBoxplot-1.png)<!-- -->
-
-``` r
-level_id.model_coefs %>% 
-  left_join(student_info %>% select(anon_id, native_language), by = 'anon_id') %>% 
-  left_join(future_tokens_data %>% select(anon_id, level_id), by = 'anon_id') %>% 
-  ggplot()+
-  geom_boxplot(aes(x = factor(level_id.y), y = level_id.x)) + 
-  labs(x = "ELI Level", y = "Random Speaker Slope", title = "Effects of ELI Level on Speaker Slope")
-```
-
-![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png)<!-- -->
-
-``` r
 anova(level_id.intercepts_and_slope_model)
 ```
 
@@ -600,6 +573,7 @@ future_tokens_data %>%
 ```
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-longAnProf-1.png)<!-- -->
+![Correlation Image](../images/DataAnalysis-longAnProf-1.png)
 
 ``` r
 future_tokens_data %>% 
@@ -620,3 +594,4 @@ future_tokens_data %>%
 ```
 
 ![](C:/Users/dcraw/projects/ling_projects/Future-Tense-Construction-L2English/images/DataAnalysis-longAnWill-1.png)<!-- -->
+![Correlation Image](../images/DataAnalysis-longAnWill-1.png)
