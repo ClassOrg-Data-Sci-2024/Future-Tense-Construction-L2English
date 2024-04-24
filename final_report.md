@@ -53,29 +53,30 @@ Students who took more than one set of proficiency (3%) exams were excluded from
 
 ## Results
 
-In the corpus, 18,490 instances of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%). The vast majority (98.75%) of verbs that follow `will` are of the base form, as are (98.62%) of verbs following the `going to` construction. This suggests that the context of the sentence, as of the current part-of-speech tagging scheme, will be unlikely to hold explanatory power.
+In the corpus, 18,490 instances of the future tense construction were found: `will` construction count was 19,762 (90.7%) and `going to` construction count was 1,728 (9.3%). The vast majority (98.75%) of verbs that follow `will` are of the base form, as are (98.62%) of verbs following the `going to` construction. This suggests that the context of the sentence, as of the current part-of-speech tagging scheme, will be unlikely to hold explanatory power. There were 23 stunts in Level 2, 394 in Level 3, 709 in Level 4, and 430 in Level 3; this imbalance is addressed.
 
-
-A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an anlayis would also become statistally problematic if predictions of the  *proportion* of times a student would use one constuction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.  
+A correlation across groups of students was not deemed prudent. There appeared to be now qualitative correlation found, with any of the proficiency scores. Such an anlayis would also become statistically problematic if predictions of the  *proportion* of times a student would use one constuction or the other suggested values outside of 0.0 to 1.0. So, we turn to the mixed methods approach discussed previously.  
 
 ![Figure 1. Each Proficency Score and Percentage of `will` Construction](/images/DataAnalysis-corrAn-1.png)
 
 
-
-
 Conducting a random effects model, with random slopes and random intercepts that predicts whether a instance of future tense construction will use the `will` or `going to` variant (with `will` being a value of 1 and `going to` a value of 0), proficiency is found to be a significant (`t = 2.871`) predictor of construction preference.
 
-Further, Figure 1 shows that the random intercepts found by the model vary in distribution significantly (p = 0.00829), as do the slopes (p \< 0.001) found by the model, shown in Figure 2.
+Further, Figure 2 shows that the random intercepts found by the model vary in distribution significantly (p = 0.00829), as do the slopes (p \< 0.001) found by the model, shown in Figure 4.
 
-![Figure 1. Boxplot of Intercepts predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png)
+![Figure 2. Boxplot of Intercepts predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfInts-1.png)
 
-![Figure 2. Boxplot of Slopes predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)
+![Figure 3. Boxplot of Slopes predicted By Proficiency grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntRandSlopeLevelBoxplotOfSlopes-1.png)
 
-A similar analysis was conducted on the effects of the level of the students. The level of the course the student was in was also found to be a significant (t = 2.791) predictor of preference for construction. The resulting Intercepts and slopes are shown in Figure 3 and Figure 4 respectively. 
+Because there was steep imbalance in the number of students in level 2 the same model was run excluding these students. This model (t = 2.381) also found that slope was a significant predictor, when comparing levels 3 and higher (p = 0.002), but Intercepts were not found to vary significantly by level (p = 0.20), in the model that used proficiency to predict future tense construction.  
 
-![Figure 3. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplot-1.png)
+A similar analysis was conducted on the effects of the level of the students. The level of the course the student was in was also found to be a significant (t = 2.791) predictor of preference for construction. The resulting Intercepts and slopes are shown in Figure 4 and Figure 5 respectively. This finding is futher supported by a significant difference in Intercepts by level (p < 0.001) and a significant difference in Slopes by level (p = 0.004). When Level 2 students were removed from the model, the results hold (t = 2.339), with Intercepts having p = 0.011, and Slopes having p = 0.047, when group by Level 3 and up. 
 
-![Figure 4. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png)
+![Figure 4. Boxplot of Intercepts predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplot-1.png)
+
+![Figure 5. Boxplot of Slopes predicted By Level grouped by Level - Random Intercepts and Random Slopes Model](/images/DataAnalysis-randIntSloLevelBoxplotSlope-1.png)
+
+
 
 ## Discussion
 
