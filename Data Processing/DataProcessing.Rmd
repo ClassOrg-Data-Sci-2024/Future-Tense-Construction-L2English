@@ -170,7 +170,9 @@ countruction_counts_and_student_info  = PELIC_compiled %>%
 ### Bring in score data
 
 ```{r, label = 'joinScores'}
-c
+#score Data
+score_data = as_tibble(read.csv(url('https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/test_scores.csv')))
+
 
 #Find students who took the test more than once
 n_occur <- data.frame(table(score_data$anon_id))

@@ -4,7 +4,7 @@ Daniel Crawford
 
 LING2020 - Data Science for Research in Linguistics
 
-Final Report - Future Tense Construction Preference in L2 English Learners.pdf
+Final Report - Future Tense Construction Preference in L2 English Learners
 
 ## Introduction
 
@@ -22,23 +22,23 @@ In a review of the construction of the future tense in English, Berglund (2005) 
 -   `going to`: "I am going to walk tomorrow."
 -   `gonna`: "I am gonna walk tomorrow."
 
-Note that these constructions directly indicate that the verb will take place in the future, so this will not investigate constructions like a plan: "I plan to walk tomorrow." Research has been conducted in this area, finding that learners of English were over five times more likely to use the `will` construction than the `going to` construction. This is an interesting result because it is also found that the will construction emerges earlier than the going to construction. This project seeks to address these questions and analyze the role of proficiency in students' preference for one construction or the other.
+Note that these constructions directly indicate that the verb will take place in the future, so this project will not investigate lexical constructions like a plan: "I plan to walk tomorrow." Research has been conducted in this area, finding that learners of English were over five times more likely to use the `will` construction than the `going to` construction. This is an interesting result because it is also found that the will construction emerges earlier than the going to construction (Bardovi-Harlig, 2005). This project seeks to address these questions and analyze the role of proficiency in students' preference for one construction or the other.
 
 ### Data
 
-The data utilized to suggest an answer to this question comes from the [University of Pittsburgh English Language Institute Corpus (PELIC)](https://eli-data-mining-group.github.io/Pitt-ELI-Corpus/) ([GitHub Repo](https://github.com/ELI-Data-Mining-Group/PELIC-dataset)). This corpus is a collection of written responses from 1177 students enrolled in the University of Pittsburgh's Intensive English Program from 2005 to 2012 in an English for Academic Purposes Context. The data comprises 46,230 texts and 4,250,703 tokens. Each text has been tokenized and lemmatized, according to the Penn Tree Bank (Marcus, 1999). This was done with Python's NLTK library, as was Part-of-Speech tagging, utilizing the [Penn Treebank POS tagset](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html).
+The data utilized to suggest an answer to this question comes from the [University of Pittsburgh English Language Institute Corpus (PELIC)](https://eli-data-mining-group.github.io/Pitt-ELI-Corpus/) ([GitHub Repo](https://github.com/ELI-Data-Mining-Group/PELIC-dataset)). This corpus is a collection of written responses from 1177 students enrolled in the [University of Pittsburgh's Intensive English Program](https://www.eli.pitt.edu/) from 2005 to 2012 in an English for Academic Purposes Context. The data comprises 46,230 texts and 4,250,703 tokens. Each text has been tokenized and lemmatized, according to the Penn Tree Bank (Marcus, 1999). This was done with Python's NLTK library, as was Part-of-Speech tagging, utilizing the [Penn Treebank POS tagset](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html).
 
 ### Methods
 
-This project aimed to understand the role of proficiency in future tense construction preference. The methods selected captured the effects of proficiency score on whether a speaker would use will or going to in a particular token. That is, a token-level analysis was conducted.
+This project aimed to understand the role of proficiency in future tense construction preference. The methods selected captured the effects of proficiency score on whether a speaker would use `will` or `going to` in a particular instance. That is, a token-level analysis was conducted.
 
-Proficiency was measured as the mean of the following scores z-scored normalized:
+Proficiency was measured as the mean of the following scores (z-scored normalized):
 
 -   `LCT_Score`: an ELI (English Language Institute) listening test
 -   `Writing_Sample`: an ELI (English Language Institute) writing test
 -   `MTELP_Conv_Score`: combined score from the [Michigan Test of English Language Proficiency](https://michiganassessment.org/michigan-tests/met-new/).
 
-(Raw scores were provided in the data set.) Proficiency was also operationalized by the course level, the student was in:
+(Raw scores were provided in the data set.) Proficiency was also operationalized by the [course level](https://github.com/ELI-Data-Mining-Group/PELIC-dataset?tab=readme-ov-file#glossary-of-codes-in-files), the student was in:
 
 -   `2`: Pre-Intermediate
 -   `3`: Intermediate
@@ -47,9 +47,9 @@ Proficiency was measured as the mean of the following scores z-scored normalized
 
 For the models used, the number of the course will be treated as a real number value, minus 2: 2 \> 0, 3 \> 1, etc. This allows for a mixed effects model to be used, and then the coefficient of the level can be thought of as corresponding changes due to one increase in level. s
 
-The tokens were found by searching for `will` and a modal (`MD` tag) and a `going` token followed by a `to` token, followed withing two tokens by a verb (to allow for modifiers.) Note that there are only 28 occurrences of `shall` in the entire corpus, and following previous research (Bardovi-Harlig, 2005), was not included in the analysis. Each occurrence of a `will` or `going to` construction was treated as an individual observation. Then, considering each student as a 'group' whose members are the tokens of future construction, a mixed effects model was fit. This method selection is in accordance with research on language variation and change, which suggests that meaningful insights are contained in random intercepts of random effects models (Drager & Hay 2012).
+The tokens were found by searching for `will` lemma (this includes `'ll` and `wo` as in `wo'nt') and a modal (`MD` tag) and a `going` token followed by a `to` token, followed within two tokens by a verb (to allow for modifiers.) Note that there are only 28 occurrences of `shall` in the entire corpus, and following previous research (Bardovi-Harlig, 2005), was not included in the analysis. Each occurrence of a `will` or `going to` construction was treated as an individual observation. Then, considering each student as a 'group' whose members are _that student's_ tokens of future construction, a mixed effects model was fit. This method selection is in accordance with research on language variation and change, which suggests that meaningful insights are contained in random intercepts of random effects models (Drager & Hay, 2012).
 
-Students who took more than one set of proficiency (3%) exams were excluded from the main analysis, and had a separate longitudinal analysis conducted on their data points.
+Students who took more than one set of proficiency (3%) exams were excluded from the main analysis, and had a separate qualitative longitudinal analysis conducted on their data points.
 
 ## Results
 

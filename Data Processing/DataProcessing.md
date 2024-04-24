@@ -300,6 +300,7 @@ countruction_counts_and_student_info  = PELIC_compiled %>%
 #score Data
 score_data = as_tibble(read.csv(url('https://github.com/ELI-Data-Mining-Group/PELIC-dataset/raw/master/corpus_files/test_scores.csv')))
 
+
 #Find students who took the test more than once
 n_occur <- data.frame(table(score_data$anon_id))
 multiple_ids = n_occur[n_occur$Freq > 1,]$Var1
@@ -336,6 +337,51 @@ filtered_tokenized_data = tokenized_df_unnested %>%
 
 filtered_tokenized_data %>% write.csv(paste0(dirname(getwd()),'/Data Files/filtered_tokenized_data.csv'))
 ```
+
+``` r
+tokenized_df_unnested %>% 
+  filter(trimws(lemma) == 'shall')
+```
+
+    ##          X answer_id token  lemma POS
+    ## 1   147874      1356 shall  shall  MD
+    ## 2   702641      7475 shall  shall  MD
+    ## 3   991028     10985 shall  shall  MD
+    ## 4   992178     10989 shall  shall  MD
+    ## 5  1004947     11216 shall  shall  MD
+    ## 6  1005012     11216 shall  shall  MD
+    ## 7  1043876     11555 shall  shall  MD
+    ## 8  1701108     18472 shall  shall  MD
+    ## 9  1856173     19697 shall  shall  MD
+    ## 10 1864324     19789 shall  shall  MD
+    ## 11 1904452     20364 shall  shall  MD
+    ## 12 1904522     20364 shall  shall  MD
+    ## 13 1904680     20365 shall  shall  MD
+    ## 14 1904753     20365 shall  shall  MD
+    ## 15 2089870     22257 shall  shall  MD
+    ## 16 2151607     22877 shall  shall  MD
+    ## 17 2151766     22892 shall  shall  MD
+    ## 18 2152023     22898 shall  shall  MD
+    ## 19 2156861     22972 shall  shall  MD
+    ## 20 2313970     23796 shall  shall  MD
+    ## 21 2345138     24015 shall  shall  MD
+    ## 22 2345163     24015 shall  shall  MD
+    ## 23 2345901     24019 shall  shall  MD
+    ## 24 2345945     24019 shall  shall  MD
+    ## 25 2358218     24080 shall  shall  MD
+    ## 26 2358262     24080 shall  shall  MD
+    ## 27 2419443     25045 shall  shall  MD
+    ## 28 2647656     26976 shall  shall  MD
+    ## 29 2653117     27111 shall  shall  MD
+    ## 30 2655256     27219 shall  shall  MD
+    ## 31 2666836     27391 shall  shall  MD
+    ## 32 2668151     27392 shall  shall  MD
+    ## 33 2682378     27581 shall  shall  MD
+    ## 34 2688160     27604 shall  shall  MD
+    ## 35 2934347     30114 shall  shall  MD
+    ## 36 2934636     30114 shall  shall  MD
+    ## 37 3062893     31268 shall  shall  MD
+    ## 38 3072258     31350 shall  shall  MD
 
 ## Session Info
 
